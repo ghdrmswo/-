@@ -901,6 +901,8 @@
           location: shotData.location || '',
           props: shotData.props || '',
           setDesign: shotData.setDesign || '',
+          // 이미지 필드
+          image: shotData.image || null,
         };
         scene.shots.push(shot);
         this.updateStoryboardTimestamp(storyboardId);
@@ -943,6 +945,7 @@
         if (updates.location !== undefined) shot.location = updates.location;
         if (updates.props !== undefined) shot.props = updates.props;
         if (updates.setDesign !== undefined) shot.setDesign = updates.setDesign;
+        if (updates.image !== undefined) shot.image = updates.image;
 
         this.updateStoryboardTimestamp(storyboardId);
         this.persistToStorage();
@@ -1328,6 +1331,15 @@
                 <textarea id="description-textarea" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="이 컷에 대한 설명을 입력하세요..."></textarea>
               </div>
 
+              <!-- 이미지 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🖼️ 이미지</h3>
+              <div class="mb-4">
+                <label for="image-input" class="text-sm font-medium text-gray-700 mb-2">컷 이미지</label>
+                <input type="file" id="image-input" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <p class="text-xs text-gray-500 mt-1">JPG, PNG 등의 이미지 파일을 선택하세요</p>
+                <div id="image-preview" class="mt-2"></div>
+              </div>
+
               <!-- 버튼 -->
               <div class="flex gap-2 mt-6">
                 <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">컷 추가</button>
@@ -1356,23 +1368,52 @@
       const setDesign = document.getElementById('set-design-input').value;
       const description = document.getElementById('description-textarea').value;
 
-      manager.addShot(currentStoryboard.id, sceneId, {
-        composition,
-        size,
-        lens,
-        moving,
-        description,
-        technique,
-        duration,
-        character,
-        location,
-        props,
-        setDesign,
-      });
+      // 이미지 처리
+      let image = null;
+      const imageInput = document.getElementById('image-input');
+      if (imageInput.files && imageInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          image = e.target.result; // Base64 인코딩된 이미지
+          manager.addShot(currentStoryboard.id, sceneId, {
+            composition,
+            size,
+            lens,
+            moving,
+            description,
+            technique,
+            duration,
+            character,
+            location,
+            props,
+            setDesign,
+            image,
+          });
 
-      currentStoryboard = manager.getStoryboard(currentStoryboard.id);
-      closeModal();
-      renderStoryboardEditor();
+          currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+          closeModal();
+          renderStoryboardEditor();
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+      } else {
+        manager.addShot(currentStoryboard.id, sceneId, {
+          composition,
+          size,
+          lens,
+          moving,
+          description,
+          technique,
+          duration,
+          character,
+          location,
+          props,
+          setDesign,
+        });
+
+        currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+        closeModal();
+        renderStoryboardEditor();
+      }
     }
 
     function editShot(sceneId, shotId) {
@@ -1434,6 +1475,15 @@
                 <textarea id="description-edit" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${shot.description}</textarea>
               </div>
 
+              <!-- 이미지 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🖼️ 이미지</h3>
+              <div class="mb-4">
+                ${shot.image ? `<img src="${shot.image}" style="width: 100%; max-height: 200px; margin-bottom: 10px; border-radius: 4px; object-fit: cover;">` : ''}
+                <label for="image-edit-input" class="text-sm font-medium text-gray-700 mb-2">컷 이미지</label>
+                <input type="file" id="image-edit-input" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <p class="text-xs text-gray-500 mt-1">새 이미지를 선택하여 업데이트할 수 있습니다</p>
+              </div>
+
               <!-- 버튼 -->
               <div class="flex gap-2 mt-6">
                 <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">저장</button>
@@ -1462,23 +1512,51 @@
       const setDesign = document.getElementById('set-design-edit').value;
       const description = document.getElementById('description-edit').value;
 
-      manager.updateShot(currentStoryboard.id, sceneId, shotId, {
-        composition,
-        size,
-        lens,
-        moving,
-        description,
-        technique,
-        duration,
-        character,
-        location,
-        props,
-        setDesign,
-      });
+      // 이미지 처리
+      const imageEditInput = document.getElementById('image-edit-input');
+      if (imageEditInput.files && imageEditInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const image = e.target.result; // Base64 인코딩된 이미지
+          manager.updateShot(currentStoryboard.id, sceneId, shotId, {
+            composition,
+            size,
+            lens,
+            moving,
+            description,
+            technique,
+            duration,
+            character,
+            location,
+            props,
+            setDesign,
+            image,
+          });
 
-      currentStoryboard = manager.getStoryboard(currentStoryboard.id);
-      closeModal();
-      renderStoryboardEditor();
+          currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+          closeModal();
+          renderStoryboardEditor();
+        };
+        reader.readAsDataURL(imageEditInput.files[0]);
+      } else {
+        manager.updateShot(currentStoryboard.id, sceneId, shotId, {
+          composition,
+          size,
+          lens,
+          moving,
+          description,
+          technique,
+          duration,
+          character,
+          location,
+          props,
+          setDesign,
+        });
+
+        currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+        closeModal();
+        renderStoryboardEditor();
+      }
     }
 
     function deleteShot(sceneId, shotId) {
@@ -1550,8 +1628,9 @@
             const techniqueLabel = TECHNIQUES.find(t => t.value === shot.technique)?.label || shot.technique;
 
             htmlContent += `
-              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 3px solid #764ba2;">
+              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 3px solid #764ba2; page-break-inside: avoid;">
                 <h4 style="font-size: 14px; color: #333; margin-bottom: 10px;">컷 #${shot.shotNumber}</h4>
+                ${shot.image ? `<img src="${shot.image}" style="width: 100%; max-height: 300px; margin-bottom: 10px; border-radius: 4px; object-fit: cover;">` : ''}
                 <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
                   <tr>
                     <td style="padding: 5px; border: 1px solid #eee; background-color: #fff; width: 25%;"><strong>구도</strong></td>
