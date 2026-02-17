@@ -806,6 +806,10 @@
           title,
           description,
           scenes: [],
+          // 마스터 사양
+          masterResolution: '1080p',
+          masterFps: '24',
+          masterColorSpace: 'srgb',
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -879,9 +883,6 @@
           location: shotData.location || '',
           props: shotData.props || '',
           setDesign: shotData.setDesign || '',
-          resolution: shotData.resolution || '1080p',
-          fps: shotData.fps || '24',
-          colorSpace: shotData.colorSpace || 'srgb',
         };
         scene.shots.push(shot);
         this.updateStoryboardTimestamp(storyboardId);
@@ -924,9 +925,6 @@
         if (updates.location !== undefined) shot.location = updates.location;
         if (updates.props !== undefined) shot.props = updates.props;
         if (updates.setDesign !== undefined) shot.setDesign = updates.setDesign;
-        if (updates.resolution !== undefined) shot.resolution = updates.resolution;
-        if (updates.fps !== undefined) shot.fps = updates.fps;
-        if (updates.colorSpace !== undefined) shot.colorSpace = updates.colorSpace;
 
         this.updateStoryboardTimestamp(storyboardId);
         this.persistToStorage();
@@ -993,8 +991,6 @@
       const lens = LENSES.find(l => l.value === shot.lens);
       const moving = MOVINGS.find(m => m.value === shot.moving);
       const technique = TECHNIQUES.find(t => t.value === shot.technique);
-      const resolution = RESOLUTIONS.find(r => r.value === shot.resolution);
-      const fps = FPS_OPTIONS.find(f => f.value === shot.fps);
 
       return `
         <div class="card border-l-4 border-blue-500 p-5">
@@ -1035,7 +1031,7 @@
               </div>
             </div>
 
-            <!-- 길이 & 인물 & 장소 -->
+            <!-- 길이 & 인물 & 장소 & 소품 & 배경 -->
             <div class="grid grid-cols-5 gap-2">
               <div class="info-item">
                 <div class="info-label">길이</div>
@@ -1057,24 +1053,6 @@
                 <div class="info-label">배경</div>
                 <div class="info-value text-xs">${shot.setDesign || '—'}</div>
               </div>
-            </div>
-
-            <!-- 기술 정보 -->
-            <div class="grid grid-cols-5 gap-2">
-              <div class="info-item">
-                <div class="info-label">해상도</div>
-                <div class="info-value">${resolution ? resolution.label : ''}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">FPS</div>
-                <div class="info-value">${fps ? fps.label : ''}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">색공간</div>
-                <div class="info-value">${shot.colorSpace}</div>
-              </div>
-              <div></div>
-              <div></div>
             </div>
           </div>
         </div>
@@ -1162,6 +1140,32 @@
         </header>
 
         <main>
+          <!-- 마스터 사양 설정 -->
+          <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-md p-6 mb-8 border border-purple-200">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <h2 class="text-2xl font-bold text-gray-900">⚙️ 마스터 사양</h2>
+                <p class="text-sm text-gray-600 mt-1">프로젝트 전체의 기술 사양을 설정합니다</p>
+              </div>
+              <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium" onclick="showMasterSpecDialog()">수정</button>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-xs font-semibold text-gray-500 uppercase mb-1">해상도</div>
+                <div class="text-lg font-bold text-gray-900">${currentStoryboard.masterResolution}</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-xs font-semibold text-gray-500 uppercase mb-1">프레임레이트</div>
+                <div class="text-lg font-bold text-gray-900">${currentStoryboard.masterFps}</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-xs font-semibold text-gray-500 uppercase mb-1">색공간</div>
+                <div class="text-lg font-bold text-gray-900">${currentStoryboard.masterColorSpace}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 프로젝트 정보 -->
           <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <div class="flex justify-between items-start">
               <div>
@@ -1288,14 +1292,6 @@
                 </div>
               </div>
 
-              <!-- 기술 정보 -->
-              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">⚙️ 기술 정보</h3>
-              <div class="form-group mb-4">
-                ${createSelect('resolution-select', '해상도', RESOLUTIONS, '1080p')}
-                ${createSelect('fps-select', 'FPS', FPS_OPTIONS, '24')}
-                ${createSelect('color-space-select', '색공간', COLOR_SPACES, 'srgb')}
-              </div>
-
               <!-- 설명 -->
               <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📝 설명</h3>
               <div class="mb-4">
@@ -1329,9 +1325,6 @@
       const location = document.getElementById('location-input').value;
       const props = document.getElementById('props-input').value;
       const setDesign = document.getElementById('set-design-input').value;
-      const resolution = document.getElementById('resolution-select').value;
-      const fps = document.getElementById('fps-select').value;
-      const colorSpace = document.getElementById('color-space-select').value;
       const description = document.getElementById('description-textarea').value;
 
       manager.addShot(currentStoryboard.id, sceneId, {
@@ -1346,9 +1339,6 @@
         location,
         props,
         setDesign,
-        resolution,
-        fps,
-        colorSpace,
       });
 
       currentStoryboard = manager.getStoryboard(currentStoryboard.id);
@@ -1408,14 +1398,6 @@
                 </div>
               </div>
 
-              <!-- 기술 정보 -->
-              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">⚙️ 기술 정보</h3>
-              <div class="form-group mb-4">
-                ${createSelect('resolution-edit', '해상도', RESOLUTIONS, shot.resolution)}
-                ${createSelect('fps-edit', 'FPS', FPS_OPTIONS, shot.fps)}
-                ${createSelect('color-space-edit', '색공간', COLOR_SPACES, shot.colorSpace)}
-              </div>
-
               <!-- 설명 -->
               <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📝 설명</h3>
               <div class="mb-4">
@@ -1449,9 +1431,6 @@
       const location = document.getElementById('location-edit').value;
       const props = document.getElementById('props-edit').value;
       const setDesign = document.getElementById('set-design-edit').value;
-      const resolution = document.getElementById('resolution-edit').value;
-      const fps = document.getElementById('fps-edit').value;
-      const colorSpace = document.getElementById('color-space-edit').value;
       const description = document.getElementById('description-edit').value;
 
       manager.updateShot(currentStoryboard.id, sceneId, shotId, {
@@ -1466,9 +1445,6 @@
         location,
         props,
         setDesign,
-        resolution,
-        fps,
-        colorSpace,
       });
 
       currentStoryboard = manager.getStoryboard(currentStoryboard.id);
@@ -1495,6 +1471,49 @@
       a.download = `${currentStoryboard.title}-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function showMasterSpecDialog() {
+      if (!currentStoryboard) return;
+      const html = `
+        <div class="modal-overlay" onclick="if(event.target === this) closeModal()">
+          <div class="modal">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">⚙️ 마스터 사양 설정</h2>
+            <p class="text-sm text-gray-600 mb-6">프로젝트 전체에 적용될 기술 사양을 설정합니다</p>
+            <form onsubmit="handleMasterSpecUpdate(event)">
+              <div class="form-group mb-4">
+                ${createSelect('master-resolution-select', '해상도', RESOLUTIONS, currentStoryboard.masterResolution)}
+                ${createSelect('master-fps-select', 'FPS', FPS_OPTIONS, currentStoryboard.masterFps)}
+                ${createSelect('master-color-space-select', '색공간', COLOR_SPACES, currentStoryboard.masterColorSpace)}
+              </div>
+
+              <div class="flex gap-2 mt-6">
+                <button type="submit" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium">저장</button>
+                <button type="button" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium" onclick="closeModal()">취소</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.getElementById('app').insertAdjacentHTML('beforeend', html);
+    }
+
+    function handleMasterSpecUpdate(event) {
+      event.preventDefault();
+      if (!currentStoryboard) return;
+
+      const masterResolution = document.getElementById('master-resolution-select').value;
+      const masterFps = document.getElementById('master-fps-select').value;
+      const masterColorSpace = document.getElementById('master-color-space-select').value;
+
+      currentStoryboard.masterResolution = masterResolution;
+      currentStoryboard.masterFps = masterFps;
+      currentStoryboard.masterColorSpace = masterColorSpace;
+      currentStoryboard.updatedAt = new Date();
+
+      manager.persistToStorage();
+      closeModal();
+      renderStoryboardEditor();
     }
 
     function closeModal() {
