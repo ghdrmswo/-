@@ -112,26 +112,6 @@
       color: var(--gray-500);
     }
 
-    .text-blue-100 {
-      color: var(--blue-100);
-    }
-
-    .text-blue-50 {
-      color: #f0f9ff;
-    }
-
-    .text-blue-600 {
-      color: var(--blue-600);
-    }
-
-    .text-green-600 {
-      color: var(--green-600);
-    }
-
-    .text-red-600 {
-      color: var(--red-600);
-    }
-
     .text-sm {
       font-size: 0.875rem;
     }
@@ -196,12 +176,21 @@
       grid-template-columns: repeat(1, minmax(0, 1fr));
     }
 
+    .grid-cols-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .grid-cols-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
     @media (min-width: 768px) {
       .md\:grid-cols-2 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      .md\:grid-cols-2.gap-4 {
-        gap: 1rem;
       }
     }
 
@@ -505,16 +494,6 @@
       transition: all 0.2s;
     }
 
-    .center-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 2rem;
-    }
-
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -527,6 +506,8 @@
       justify-content: center;
       padding: 1rem;
       z-index: 50;
+      max-height: 100vh;
+      overflow-y: auto;
     }
 
     .modal {
@@ -534,8 +515,10 @@
       border-radius: 0.5rem;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       padding: 1.5rem;
-      max-width: 28rem;
+      max-width: 36rem;
       width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .card {
@@ -598,9 +581,58 @@
       margin-bottom: 0.5rem;
     }
 
-    .grid-cols-2 {
+    .form-group {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 4rem;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .info-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background-color: var(--blue-50);
+      color: var(--blue-600);
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-item {
+      background-color: var(--gray-50);
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border-left: 3px solid var(--blue-500);
+    }
+
+    .info-label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+      font-size: 0.875rem;
+      color: var(--gray-900);
+      font-weight: 500;
     }
 
     @media (max-width: 768px) {
@@ -644,22 +676,6 @@
 
     p {
       margin: 0;
-    }
-
-    .form-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 4rem;
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
   </style>
 </head>
@@ -710,6 +726,36 @@
       { value: 'zoom', label: '줌' },
       { value: 'tracking', label: '트래킹 (따라감)' },
       { value: 'handheld', label: '핸드헬드 (손 흔들림)' },
+    ];
+
+    // 새 요소들 - 3, 4, 6, 7
+    const TECHNIQUES = [
+      { value: 'normal', label: '일반촬영' },
+      { value: 'slow_motion', label: '슬로모션' },
+      { value: 'timelapse', label: '타임랩스' },
+      { value: 'high_speed', label: '하이스피드' },
+    ];
+
+    const RESOLUTIONS = [
+      { value: '4k', label: '4K (3840x2160)' },
+      { value: '2k', label: '2K (2560x1440)' },
+      { value: '1080p', label: '1080p (Full HD)' },
+      { value: '720p', label: '720p (HD)' },
+    ];
+
+    const FPS_OPTIONS = [
+      { value: '24', label: '24fps' },
+      { value: '25', label: '25fps' },
+      { value: '30', label: '30fps' },
+      { value: '60', label: '60fps' },
+      { value: '120', label: '120fps' },
+    ];
+
+    const COLOR_SPACES = [
+      { value: 'srgb', label: 'sRGB' },
+      { value: 'dci-p3', label: 'DCI-P3' },
+      { value: 'rec2020', label: 'Rec.2020' },
+      { value: 'log', label: 'Log (C-Log, S-Log)' },
     ];
 
     // ============================================
@@ -826,6 +872,16 @@
           moving: shotData.moving,
           description: shotData.description || '',
           notes: shotData.notes || '',
+          // 새 필드들
+          technique: shotData.technique || 'normal',
+          duration: shotData.duration || '3',
+          character: shotData.character || '',
+          location: shotData.location || '',
+          props: shotData.props || '',
+          setDesign: shotData.setDesign || '',
+          resolution: shotData.resolution || '1080p',
+          fps: shotData.fps || '24',
+          colorSpace: shotData.colorSpace || 'srgb',
         };
         scene.shots.push(shot);
         this.updateStoryboardTimestamp(storyboardId);
@@ -862,6 +918,15 @@
         if (updates.moving !== undefined) shot.moving = updates.moving;
         if (updates.description !== undefined) shot.description = updates.description;
         if (updates.notes !== undefined) shot.notes = updates.notes;
+        if (updates.technique !== undefined) shot.technique = updates.technique;
+        if (updates.duration !== undefined) shot.duration = updates.duration;
+        if (updates.character !== undefined) shot.character = updates.character;
+        if (updates.location !== undefined) shot.location = updates.location;
+        if (updates.props !== undefined) shot.props = updates.props;
+        if (updates.setDesign !== undefined) shot.setDesign = updates.setDesign;
+        if (updates.resolution !== undefined) shot.resolution = updates.resolution;
+        if (updates.fps !== undefined) shot.fps = updates.fps;
+        if (updates.colorSpace !== undefined) shot.colorSpace = updates.colorSpace;
 
         this.updateStoryboardTimestamp(storyboardId);
         this.persistToStorage();
@@ -927,6 +992,9 @@
       const size = SIZES.find(s => s.value === shot.size);
       const lens = LENSES.find(l => l.value === shot.lens);
       const moving = MOVINGS.find(m => m.value === shot.moving);
+      const technique = TECHNIQUES.find(t => t.value === shot.technique);
+      const resolution = RESOLUTIONS.find(r => r.value === shot.resolution);
+      const fps = FPS_OPTIONS.find(f => f.value === shot.fps);
 
       return `
         <div class="card border-l-4 border-blue-500 p-4">
@@ -940,23 +1008,72 @@
               <button class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition" onclick="deleteShot('${sceneId}', '${shot.id}')">삭제</button>
             </div>
           </div>
-          <div class="space-y-2">
+
+          <!-- 기본 카메라 정보 -->
+          <div class="space-y-2 mb-4">
             <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">구도</p>
-                <p class="composition-badge composition-${shot.composition}">${composition ? composition.label : ''}</p>
+              <div class="info-item">
+                <div class="info-label">구도</div>
+                <div class="composition-badge composition-${shot.composition}">${composition ? composition.label : ''}</div>
               </div>
-              <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">사이즈</p>
-                <p class="text-sm font-medium text-gray-700">${size ? size.label : ''}</p>
+              <div class="info-item">
+                <div class="info-label">사이즈</div>
+                <div class="info-value">${size ? size.label.split(' -')[0] : ''}</div>
               </div>
-              <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">렌즈</p>
-                <p class="text-sm font-medium text-gray-700">${lens ? lens.label : ''}</p>
+              <div class="info-item">
+                <div class="info-label">렌즈</div>
+                <div class="info-value">${lens ? lens.label : ''}</div>
               </div>
-              <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">무빙</p>
-                <p class="text-sm font-medium text-gray-700">${moving ? moving.label : ''}</p>
+              <div class="info-item">
+                <div class="info-label">무빙</div>
+                <div class="info-value">${moving ? moving.label.split(' ')[0] : ''}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 신규 요소 정보 -->
+          <div class="space-y-2">
+            <!-- 촬영 기법 & 길이 -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="info-item">
+                <div class="info-label">촬영 기법</div>
+                <div class="info-value">${technique ? technique.label : ''}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">길이</div>
+                <div class="info-value">${shot.duration}초</div>
+              </div>
+            </div>
+
+            <!-- 인물 & 장소 -->
+            ${shot.character || shot.location ? `
+              <div class="grid grid-cols-2 gap-2">
+                ${shot.character ? `<div class="info-item"><div class="info-label">인물</div><div class="info-value">${shot.character}</div></div>` : ''}
+                ${shot.location ? `<div class="info-item"><div class="info-label">장소</div><div class="info-value">${shot.location}</div></div>` : ''}
+              </div>
+            ` : ''}
+
+            <!-- 소품 & 배경설정 -->
+            ${shot.props || shot.setDesign ? `
+              <div class="grid grid-cols-2 gap-2">
+                ${shot.props ? `<div class="info-item"><div class="info-label">소품</div><div class="info-value text-xs">${shot.props}</div></div>` : ''}
+                ${shot.setDesign ? `<div class="info-item"><div class="info-label">배경설정</div><div class="info-value text-xs">${shot.setDesign}</div></div>` : ''}
+              </div>
+            ` : ''}
+
+            <!-- 기술 정보 -->
+            <div class="grid grid-cols-3 gap-2">
+              <div class="info-item">
+                <div class="info-label">해상도</div>
+                <div class="info-value">${resolution ? resolution.label : ''}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">FPS</div>
+                <div class="info-value">${fps ? fps.label : ''}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">색공간</div>
+                <div class="info-value">${shot.colorSpace}</div>
               </div>
             </div>
           </div>
@@ -1131,17 +1248,63 @@
           <div class="modal">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">새로운 컷 추가</h2>
             <form onsubmit="handleAddShot(event, '${sceneId}')">
+              <!-- 카메라 정보 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📷 카메라 정보</h3>
               <div class="form-group mb-4">
                 ${createSelect('composition-select', '구도', COMPOSITIONS, 'eye_level')}
                 ${createSelect('size-select', '사이즈', SIZES, 'full_shot')}
                 ${createSelect('lens-select', '렌즈', LENSES, '50mm')}
                 ${createSelect('moving-select', '무빙', MOVINGS, 'static')}
               </div>
+
+              <!-- 촬영 기법 & 길이 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">⏱️ 촬영 정보</h3>
+              <div class="form-group mb-4">
+                ${createSelect('technique-select', '촬영 기법', TECHNIQUES, 'normal')}
+                <div>
+                  <label for="duration-input" class="text-sm font-medium text-gray-700 mb-2">장면 길이 (초)</label>
+                  <input type="number" id="duration-input" min="1" max="300" value="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+              </div>
+
+              <!-- 배경/세트 정보 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🎬 배경 정보</h3>
+              <div class="form-group mb-4">
+                <div>
+                  <label for="character-input" class="text-sm font-medium text-gray-700 mb-2">등장인물</label>
+                  <input type="text" id="character-input" placeholder="예: 주인공, 조연" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="location-input" class="text-sm font-medium text-gray-700 mb-2">장소</label>
+                  <input type="text" id="location-input" placeholder="예: 사무실, 야외" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="props-input" class="text-sm font-medium text-gray-700 mb-2">소품</label>
+                  <input type="text" id="props-input" placeholder="예: 책상, 의자, 카메라" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="set-design-input" class="text-sm font-medium text-gray-700 mb-2">배경설정</label>
+                  <input type="text" id="set-design-input" placeholder="예: 따뜻한 톤, 미니멀" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+              </div>
+
+              <!-- 기술 정보 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">⚙️ 기술 정보</h3>
+              <div class="form-group mb-4">
+                ${createSelect('resolution-select', '해상도', RESOLUTIONS, '1080p')}
+                ${createSelect('fps-select', 'FPS', FPS_OPTIONS, '24')}
+                ${createSelect('color-space-select', '색공간', COLOR_SPACES, 'srgb')}
+              </div>
+
+              <!-- 설명 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📝 설명</h3>
               <div class="mb-4">
                 <label for="description-textarea" class="text-sm font-medium text-gray-700 mb-2">설명 (선택)</label>
                 <textarea id="description-textarea" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="이 컷에 대한 설명을 입력하세요..."></textarea>
               </div>
-              <div class="flex gap-2">
+
+              <!-- 버튼 -->
+              <div class="flex gap-2 mt-6">
                 <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">컷 추가</button>
                 <button type="button" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium" onclick="closeModal()">취소</button>
               </div>
@@ -1160,6 +1323,15 @@
       const size = document.getElementById('size-select').value;
       const lens = document.getElementById('lens-select').value;
       const moving = document.getElementById('moving-select').value;
+      const technique = document.getElementById('technique-select').value;
+      const duration = document.getElementById('duration-input').value;
+      const character = document.getElementById('character-input').value;
+      const location = document.getElementById('location-input').value;
+      const props = document.getElementById('props-input').value;
+      const setDesign = document.getElementById('set-design-input').value;
+      const resolution = document.getElementById('resolution-select').value;
+      const fps = document.getElementById('fps-select').value;
+      const colorSpace = document.getElementById('color-space-select').value;
       const description = document.getElementById('description-textarea').value;
 
       manager.addShot(currentStoryboard.id, sceneId, {
@@ -1168,6 +1340,15 @@
         lens,
         moving,
         description,
+        technique,
+        duration,
+        character,
+        location,
+        props,
+        setDesign,
+        resolution,
+        fps,
+        colorSpace,
       });
 
       currentStoryboard = manager.getStoryboard(currentStoryboard.id);
@@ -1187,17 +1368,63 @@
           <div class="modal">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">컷 편집</h2>
             <form onsubmit="handleUpdateShot(event, '${sceneId}', '${shotId}')">
+              <!-- 카메라 정보 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📷 카메라 정보</h3>
               <div class="form-group mb-4">
                 ${createSelect('composition-edit', '구도', COMPOSITIONS, shot.composition)}
                 ${createSelect('size-edit', '사이즈', SIZES, shot.size)}
                 ${createSelect('lens-edit', '렌즈', LENSES, shot.lens)}
                 ${createSelect('moving-edit', '무빙', MOVINGS, shot.moving)}
               </div>
+
+              <!-- 촬영 기법 & 길이 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">⏱️ 촬영 정보</h3>
+              <div class="form-group mb-4">
+                ${createSelect('technique-edit', '촬영 기법', TECHNIQUES, shot.technique)}
+                <div>
+                  <label for="duration-edit" class="text-sm font-medium text-gray-700 mb-2">장면 길이 (초)</label>
+                  <input type="number" id="duration-edit" min="1" max="300" value="${shot.duration}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+              </div>
+
+              <!-- 배경/세트 정보 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🎬 배경 정보</h3>
+              <div class="form-group mb-4">
+                <div>
+                  <label for="character-edit" class="text-sm font-medium text-gray-700 mb-2">등장인물</label>
+                  <input type="text" id="character-edit" value="${shot.character}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="location-edit" class="text-sm font-medium text-gray-700 mb-2">장소</label>
+                  <input type="text" id="location-edit" value="${shot.location}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="props-edit" class="text-sm font-medium text-gray-700 mb-2">소품</label>
+                  <input type="text" id="props-edit" value="${shot.props}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="set-design-edit" class="text-sm font-medium text-gray-700 mb-2">배경설정</label>
+                  <input type="text" id="set-design-edit" value="${shot.setDesign}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+              </div>
+
+              <!-- 기술 정보 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">⚙️ 기술 정보</h3>
+              <div class="form-group mb-4">
+                ${createSelect('resolution-edit', '해상도', RESOLUTIONS, shot.resolution)}
+                ${createSelect('fps-edit', 'FPS', FPS_OPTIONS, shot.fps)}
+                ${createSelect('color-space-edit', '색공간', COLOR_SPACES, shot.colorSpace)}
+              </div>
+
+              <!-- 설명 -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📝 설명</h3>
               <div class="mb-4">
                 <label for="description-edit" class="text-sm font-medium text-gray-700 mb-2">설명</label>
-                <textarea id="description-edit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="이 컷에 대한 설명을 입력하세요...">${shot.description}</textarea>
+                <textarea id="description-edit" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${shot.description}</textarea>
               </div>
-              <div class="flex gap-2">
+
+              <!-- 버튼 -->
+              <div class="flex gap-2 mt-6">
                 <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">저장</button>
                 <button type="button" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium" onclick="closeModal()">취소</button>
               </div>
@@ -1216,6 +1443,15 @@
       const size = document.getElementById('size-edit').value;
       const lens = document.getElementById('lens-edit').value;
       const moving = document.getElementById('moving-edit').value;
+      const technique = document.getElementById('technique-edit').value;
+      const duration = document.getElementById('duration-edit').value;
+      const character = document.getElementById('character-edit').value;
+      const location = document.getElementById('location-edit').value;
+      const props = document.getElementById('props-edit').value;
+      const setDesign = document.getElementById('set-design-edit').value;
+      const resolution = document.getElementById('resolution-edit').value;
+      const fps = document.getElementById('fps-edit').value;
+      const colorSpace = document.getElementById('color-space-edit').value;
       const description = document.getElementById('description-edit').value;
 
       manager.updateShot(currentStoryboard.id, sceneId, shotId, {
@@ -1224,6 +1460,15 @@
         lens,
         moving,
         description,
+        technique,
+        duration,
+        character,
+        location,
+        props,
+        setDesign,
+        resolution,
+        fps,
+        colorSpace,
       });
 
       currentStoryboard = manager.getStoryboard(currentStoryboard.id);
