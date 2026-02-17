@@ -1655,46 +1655,63 @@
             const techniqueLabel = TECHNIQUES.find(t => t.value === shot.technique)?.label || shot.technique;
 
             htmlContent += `
-              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 3px solid #764ba2; page-break-inside: avoid;">
-                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px;">컷 #${shot.shotNumber}</h4>
-                ${shot.image ? `<img src="${shot.image}" style="width: 150px; height: 100px; margin-bottom: 10px; border-radius: 4px; object-fit: cover;">` : ''}
-                <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
-                  <tr>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff; width: 25%;"><strong>구도</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${compositionLabel}</td>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff; width: 25%;"><strong>사이즈</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${sizeLabel}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>렌즈</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${lensLabel}</td>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>무빙</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${movingLabel}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>촬영기법</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${techniqueLabel}</td>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>장면길이</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${shot.duration || '-'}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>배역</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${shot.character || '-'}</td>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>장소</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${shot.location || '-'}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>소품</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${shot.props || '-'}</td>
-                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>배경설정</strong></td>
-                    <td style="padding: 5px; border: 1px solid #eee;">${shot.setDesign || '-'}</td>
-                  </tr>
-                  ${shot.description ? `
-                  <tr>
-                    <td colspan="4" style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>설명:</strong> ${shot.description}</td>
-                  </tr>
-                  ` : ''}
-                </table>
+              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 3px solid #764ba2; page-break-inside: avoid; display: flex; gap: 20px;">
+                <!-- 왼쪽: 이미지 -->
+                <div style="flex: 0 0 auto; min-width: 280px;">
+                  <h4 style="font-size: 14px; color: #333; margin-bottom: 10px;">컷 #${shot.shotNumber}</h4>
+                  ${shot.image ? `<img src="${shot.image}" style="width: 100%; height: 280px; border-radius: 4px; object-fit: cover;">` : `<div style="width: 100%; height: 280px; background-color: #e0e0e0; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999;">이미지 없음</div>`}
+                </div>
+
+                <!-- 오른쪽: 정보 -->
+                <div style="flex: 1;">
+                  <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold; width: 30%;"><strong>구도</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${compositionLabel}</td>
+                    </tr>
+                    <tr style="background-color: #fafafa;">
+                      <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>사이즈</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${sizeLabel}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>렌즈</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${lensLabel}</td>
+                    </tr>
+                    <tr style="background-color: #fafafa;">
+                      <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>무빙</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${movingLabel}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>촬영기법</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${techniqueLabel}</td>
+                    </tr>
+                    <tr style="background-color: #fafafa;">
+                      <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>장면길이</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${shot.duration || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>배역</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${shot.character || '-'}</td>
+                    </tr>
+                    <tr style="background-color: #fafafa;">
+                      <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>장소</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${shot.location || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>소품</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${shot.props || '-'}</td>
+                    </tr>
+                    <tr style="background-color: #fafafa;">
+                      <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>배경설정</strong></td>
+                      <td style="padding: 4px; border: 1px solid #ddd;">${shot.setDesign || '-'}</td>
+                    </tr>
+                    ${shot.description ? `
+                    <tr>
+                      <td colspan="2" style="padding: 4px; border: 1px solid #ddd; background-color: #fff;"><strong>설명:</strong> ${shot.description}</td>
+                    </tr>
+                    ` : ''}
+                  </table>
+                </div>
               </div>
             `;
           });
