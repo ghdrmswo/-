@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Scene, CompositionType, ShotSize, LensType, MovingType } from '@/types/storyboard'
 import { useStoryboard } from './StoryboardContext'
 import ShotCard from './ShotCard'

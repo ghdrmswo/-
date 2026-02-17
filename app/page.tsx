@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { StoryboardProvider, useStoryboard } from '@/components/StoryboardContext'
 import ScenePanel from '@/components/ScenePanel'
 import ExportButton from '@/components/ExportButton'

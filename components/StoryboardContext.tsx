@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import { StoryboardManager } from '@/lib/storyboard'
 import { Storyboard, Scene, Shot, CompositionType, ShotSize, LensType, MovingType } from '@/types/storyboard'
 
@@ -82,6 +82,7 @@ export function StoryboardProvider({ children }: { children: React.ReactNode }) 
     composition: CompositionType
     size: ShotSize
     lens: LensType
+    moving: MovingType
     description?: string
     notes?: string
   }) => {
@@ -101,6 +102,7 @@ export function StoryboardProvider({ children }: { children: React.ReactNode }) 
     composition: CompositionType
     size: ShotSize
     lens: LensType
+    moving: MovingType
     description: string
     notes: string
   }>) => {

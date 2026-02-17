@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { useStoryboard } from './StoryboardContext'
 import { exportStoryboard } from '@/lib/storage'
 
