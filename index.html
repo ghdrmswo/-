@@ -997,21 +997,22 @@
       const fps = FPS_OPTIONS.find(f => f.value === shot.fps);
 
       return `
-        <div class="card border-l-4 border-blue-500 p-4">
-          <div class="flex justify-between items-start mb-3">
-            <div>
-              <h4 class="font-semibold text-gray-800">컷 #${shot.shotNumber}</h4>
+        <div class="card border-l-4 border-blue-500 p-6 w-full">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+              <h4 class="font-bold text-lg text-gray-800">컷 #${shot.shotNumber}</h4>
               ${shot.description ? `<p class="text-sm text-gray-600 mt-1">${shot.description}</p>` : ''}
             </div>
-            <div class="flex gap-2">
-              <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition" onclick="editShot('${sceneId}', '${shot.id}')">편집</button>
-              <button class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition" onclick="deleteShot('${sceneId}', '${shot.id}')">삭제</button>
+            <div class="flex gap-2 ml-4">
+              <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition whitespace-nowrap" onclick="editShot('${sceneId}', '${shot.id}')">편집</button>
+              <button class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition whitespace-nowrap" onclick="deleteShot('${sceneId}', '${shot.id}')">삭제</button>
             </div>
           </div>
 
-          <!-- 기본 카메라 정보 -->
-          <div class="space-y-2 mb-4">
-            <div class="grid grid-cols-2 gap-4">
+          <!-- 정보 한 줄씩 표시 -->
+          <div class="space-y-3">
+            <!-- 기본 카메라 정보 -->
+            <div class="grid grid-cols-5 gap-3">
               <div class="info-item">
                 <div class="info-label">구도</div>
                 <div class="composition-badge composition-${shot.composition}">${composition ? composition.label : ''}</div>
@@ -1028,41 +1029,38 @@
                 <div class="info-label">무빙</div>
                 <div class="info-value">${moving ? moving.label.split(' ')[0] : ''}</div>
               </div>
-            </div>
-          </div>
-
-          <!-- 신규 요소 정보 -->
-          <div class="space-y-2">
-            <!-- 촬영 기법 & 길이 -->
-            <div class="grid grid-cols-2 gap-2">
               <div class="info-item">
-                <div class="info-label">촬영 기법</div>
+                <div class="info-label">기법</div>
                 <div class="info-value">${technique ? technique.label : ''}</div>
               </div>
+            </div>
+
+            <!-- 길이 & 인물 & 장소 -->
+            <div class="grid grid-cols-5 gap-3">
               <div class="info-item">
                 <div class="info-label">길이</div>
                 <div class="info-value">${shot.duration}초</div>
               </div>
+              <div class="info-item">
+                <div class="info-label">인물</div>
+                <div class="info-value">${shot.character || '—'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">장소</div>
+                <div class="info-value">${shot.location || '—'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">소품</div>
+                <div class="info-value text-xs">${shot.props || '—'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">배경</div>
+                <div class="info-value text-xs">${shot.setDesign || '—'}</div>
+              </div>
             </div>
 
-            <!-- 인물 & 장소 -->
-            ${shot.character || shot.location ? `
-              <div class="grid grid-cols-2 gap-2">
-                ${shot.character ? `<div class="info-item"><div class="info-label">인물</div><div class="info-value">${shot.character}</div></div>` : ''}
-                ${shot.location ? `<div class="info-item"><div class="info-label">장소</div><div class="info-value">${shot.location}</div></div>` : ''}
-              </div>
-            ` : ''}
-
-            <!-- 소품 & 배경설정 -->
-            ${shot.props || shot.setDesign ? `
-              <div class="grid grid-cols-2 gap-2">
-                ${shot.props ? `<div class="info-item"><div class="info-label">소품</div><div class="info-value text-xs">${shot.props}</div></div>` : ''}
-                ${shot.setDesign ? `<div class="info-item"><div class="info-label">배경설정</div><div class="info-value text-xs">${shot.setDesign}</div></div>` : ''}
-              </div>
-            ` : ''}
-
             <!-- 기술 정보 -->
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-5 gap-3">
               <div class="info-item">
                 <div class="info-label">해상도</div>
                 <div class="info-value">${resolution ? resolution.label : ''}</div>
@@ -1075,6 +1073,8 @@
                 <div class="info-label">색공간</div>
                 <div class="info-value">${shot.colorSpace}</div>
               </div>
+              <div></div>
+              <div></div>
             </div>
           </div>
         </div>
@@ -1096,7 +1096,7 @@
           </div>
           <div class="p-6">
             ${scene.shots.length === 0 ? '<p class="text-center text-gray-500 py-8">컷이 없습니다. 아래에서 컷을 추가하세요.</p>' : `
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div class="space-y-4 mb-6">
                 ${scene.shots.map(shot => createShotCard(shot, scene.id)).join('')}
               </div>
             `}
