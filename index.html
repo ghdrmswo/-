@@ -758,6 +758,16 @@
       { value: 'log', label: 'Log (C-Log, S-Log)' },
     ];
 
+    // 씬 시간대
+    const TIME_OF_DAYS = [
+      { value: 'day', label: '☀️ 낮' },
+      { value: 'night', label: '🌙 밤' },
+      { value: 'dawn', label: '🌅 새벽' },
+      { value: 'dusk', label: '🌆 황혼' },
+      { value: 'golden_hour', label: '✨ 골든아워' },
+      { value: 'blue_hour', label: '🌌 블루아워' },
+    ];
+
     // ============================================
     // 스토리보드 매니저 클래스
     // ============================================
@@ -841,9 +851,8 @@
           name,
           description,
           shots: [],
-          // 타임코드
-          startTime: '0:00',
-          endTime: '0:00',
+          // 시간대
+          timeOfDay: 'day',
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -1063,6 +1072,7 @@
     }
 
     function createScenePanel(scene) {
+      const timeOfDay = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay);
       return `
         <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg shadow-lg overflow-hidden">
           <div class="gradient-to-r text-white p-6">
@@ -1070,13 +1080,13 @@
               <div class="flex-1">
                 <div class="flex items-center gap-3">
                   <h3 class="text-2xl font-bold">씬 #${scene.sceneNumber}</h3>
-                  <div class="bg-white bg-opacity-20 px-3 py-1 rounded text-sm font-semibold">${scene.startTime} ~ ${scene.endTime}</div>
+                  <div class="bg-white bg-opacity-20 px-3 py-1 rounded text-sm font-semibold">${timeOfDay ? timeOfDay.label : scene.timeOfDay}</div>
                 </div>
                 <p class="text-blue-100 mt-1">${scene.name}</p>
                 ${scene.description ? `<p class="text-blue-50 text-sm mt-2">${scene.description}</p>` : ''}
               </div>
               <div class="flex gap-2">
-                <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition font-medium" onclick="editSceneTimecode('${scene.id}')">시간 수정</button>
+                <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition font-medium" onclick="editSceneTimecode('${scene.id}')">시간대 수정</button>
                 <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition font-medium" onclick="deleteScene('${scene.id}')">씬 삭제</button>
               </div>
             </div>
@@ -1533,19 +1543,20 @@
       const html = `
         <div class="modal-overlay" onclick="if(event.target === this) closeModal()">
           <div class="modal">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">⏱️ 씬 시간대 설정</h2>
-            <p class="text-sm text-gray-600 mb-6">씬이 시작되고 끝나는 시간을 설정합니다</p>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">🌅 씬 시간대 설정</h2>
+            <p class="text-sm text-gray-600 mb-6">이 씬이 일어나는 시간대를 선택하세요</p>
             <form onsubmit="handleSceneTimecodeUpdate(event, '${sceneId}')">
               <div class="space-y-4 mb-6">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">시작 시간</label>
-                  <input type="text" id="start-time-input" value="${scene.startTime}" placeholder="예: 0:00, 1:30" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                  <p class="text-xs text-gray-500 mt-1">형식: MM:SS (예: 0:00, 1:30, 2:45)</p>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">종료 시간</label>
-                  <input type="text" id="end-time-input" value="${scene.endTime}" placeholder="예: 0:30, 2:00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                  <p class="text-xs text-gray-500 mt-1">형식: MM:SS (예: 0:00, 1:30, 2:45)</p>
+                  <label class="block text-sm font-medium text-gray-700 mb-3">시간대</label>
+                  <div class="grid grid-cols-2 gap-3">
+                    ${TIME_OF_DAYS.map(t => `
+                      <label class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition ${scene.timeOfDay === t.value ? 'border-blue-500 bg-blue-50' : ''}">
+                        <input type="radio" name="time-of-day" value="${t.value}" ${scene.timeOfDay === t.value ? 'checked' : ''} class="mr-2" required>
+                        <span class="text-sm font-medium">${t.label}</span>
+                      </label>
+                    `).join('')}
+                  </div>
                 </div>
               </div>
 
@@ -1564,20 +1575,11 @@
       event.preventDefault();
       if (!currentStoryboard) return;
 
-      const startTime = document.getElementById('start-time-input').value.trim();
-      const endTime = document.getElementById('end-time-input').value.trim();
-
-      // 시간 형식 검증 (MM:SS)
-      const timeRegex = /^\d{1,2}:\d{2}$/;
-      if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
-        alert('시간 형식이 올바르지 않습니다. MM:SS 형식으로 입력해주세요. (예: 0:00, 1:30)');
-        return;
-      }
+      const timeOfDay = document.querySelector('input[name="time-of-day"]:checked').value;
 
       const scene = currentStoryboard.scenes.find(s => s.id === sceneId);
       if (scene) {
-        scene.startTime = startTime;
-        scene.endTime = endTime;
+        scene.timeOfDay = timeOfDay;
         scene.updatedAt = new Date();
       }
 
