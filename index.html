@@ -755,12 +755,12 @@
 
     // 씬 시간대
     const TIME_OF_DAYS = [
-      { value: 'day', label: '☀️ 낮' },
-      { value: 'night', label: '🌙 밤' },
-      { value: 'dawn', label: '🌅 새벽' },
-      { value: 'dusk', label: '🌆 황혼' },
-      { value: 'golden_hour', label: '✨ 골든아워' },
-      { value: 'blue_hour', label: '🌌 블루아워' },
+      { value: 'day', label: '낮' },
+      { value: 'night', label: '밤' },
+      { value: 'dawn', label: '새벽' },
+      { value: 'dusk', label: '황혼' },
+      { value: 'golden_hour', label: '골든아워' },
+      { value: 'blue_hour', label: '블루아워' },
     ];
 
     // ============================================
@@ -1519,10 +1519,12 @@
                   <label class="block text-sm font-medium text-gray-700 mb-3">로그촬영</label>
                   <div class="flex gap-3">
                     ${LOG_RECORDING.map(l => `
-                      <label class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition flex-1 ${currentStoryboard.masterLogRecording === l.value ? 'border-blue-500 bg-blue-50' : ''}">
-                        <input type="radio" name="log-recording" value="${l.value}" ${currentStoryboard.masterLogRecording === l.value ? 'checked' : ''} class="mr-2" required>
-                        <span class="text-sm font-medium">${l.label}</span>
-                      </label>
+                      <div class="flex-1">
+                        <input type="radio" name="log-recording" value="${l.value}" id="log-${l.value}" ${currentStoryboard.masterLogRecording === l.value ? 'checked' : ''} class="hidden" required>
+                        <label for="log-${l.value}" class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition ${currentStoryboard.masterLogRecording === l.value ? 'border-blue-500 bg-blue-50' : ''}">
+                          <span class="text-sm font-medium">${l.label}</span>
+                        </label>
+                      </div>
                     `).join('')}
                   </div>
                 </div>
@@ -1545,7 +1547,14 @@
 
       const masterResolution = document.getElementById('master-resolution-select').value;
       const masterFps = document.getElementById('master-fps-select').value;
-      const masterLogRecording = document.querySelector('input[name="log-recording"]:checked').value;
+      const masterLogRecordingElement = document.querySelector('input[name="log-recording"]:checked');
+
+      if (!masterLogRecordingElement) {
+        alert('로그촬영을 선택해주세요');
+        return;
+      }
+
+      const masterLogRecording = masterLogRecordingElement.value;
 
       currentStoryboard.masterResolution = masterResolution;
       currentStoryboard.masterFps = masterFps;
