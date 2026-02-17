@@ -992,6 +992,40 @@
     let currentStoryboard = null;
 
     // ============================================
+    // 유틸리티 함수
+    // ============================================
+
+    function compressImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // 최대 너비 800px로 리사이징
+          if (width > 800) {
+            height = (height * 800) / width;
+            width = 800;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // JPEG 품질 0.7로 압축
+          const compressedImage = canvas.toDataURL('image/jpeg', 0.7);
+          callback(compressedImage);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ============================================
     // UI 렌더링 함수
     // ============================================
 
@@ -1369,12 +1403,9 @@
       const description = document.getElementById('description-textarea').value;
 
       // 이미지 처리
-      let image = null;
       const imageInput = document.getElementById('image-input');
       if (imageInput.files && imageInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          image = e.target.result; // Base64 인코딩된 이미지
+        compressImage(imageInput.files[0], function(compressedImage) {
           manager.addShot(currentStoryboard.id, sceneId, {
             composition,
             size,
@@ -1387,14 +1418,13 @@
             location,
             props,
             setDesign,
-            image,
+            image: compressedImage,
           });
 
           currentStoryboard = manager.getStoryboard(currentStoryboard.id);
           closeModal();
           renderStoryboardEditor();
-        };
-        reader.readAsDataURL(imageInput.files[0]);
+        });
       } else {
         manager.addShot(currentStoryboard.id, sceneId, {
           composition,
@@ -1515,9 +1545,7 @@
       // 이미지 처리
       const imageEditInput = document.getElementById('image-edit-input');
       if (imageEditInput.files && imageEditInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const image = e.target.result; // Base64 인코딩된 이미지
+        compressImage(imageEditInput.files[0], function(compressedImage) {
           manager.updateShot(currentStoryboard.id, sceneId, shotId, {
             composition,
             size,
@@ -1530,14 +1558,13 @@
             location,
             props,
             setDesign,
-            image,
+            image: compressedImage,
           });
 
           currentStoryboard = manager.getStoryboard(currentStoryboard.id);
           closeModal();
           renderStoryboardEditor();
-        };
-        reader.readAsDataURL(imageEditInput.files[0]);
+        });
       } else {
         manager.updateShot(currentStoryboard.id, sceneId, shotId, {
           composition,
