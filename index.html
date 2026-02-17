@@ -1677,6 +1677,14 @@
         const timeOfDayLabel = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay)?.label || scene.timeOfDay;
 
         if (scene.shots.length > 0) {
+          // 각 씬마다 새로운 페이지 시작
+          htmlContent += `
+            <div style="page-break-before: always; padding-bottom: 20px;">
+              <h3 style="font-size: 18px; color: #667eea; margin-bottom: 15px; border-left: 4px solid #667eea; padding-left: 15px;">
+                씬 #${scene.sceneNumber} - ${scene.name}
+              </h3>
+          `;
+
           scene.shots.forEach(shot => {
             const compositionLabel = COMPOSITIONS.find(c => c.value === shot.composition)?.label || shot.composition;
             const sizeLabel = SIZES.find(s => s.value === shot.size)?.label || shot.size;
@@ -1738,6 +1746,8 @@
               </div>
             `;
           });
+
+          htmlContent += `</div>`;
         }
       });
 
