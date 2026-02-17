@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎬 스토리보드 메이커</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --blue-50: #eff6ff;
+      --blue-100: #dbeafe;
+      --blue-200: #bfdbfe;
+      --blue-300: #93c5fd;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --green-50: #f0fdf4;
+      --green-500: #22c55e;
+      --green-600: #16a34a;
+      --green-700: #15803d;
+      --red-500: #ef4444;
+      --red-600: #dc2626;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--gray-100);
+      color: var(--gray-900);
+      line-height: 1.5;
+    }
+
+    .min-h-screen {
+      min-height: 100vh;
+    }
+
+    .bg-gray-100 {
+      background-color: var(--gray-100);
+    }
+
+    .bg-white {
+      background-color: white;
+    }
+
+    .bg-gray-50 {
+      background-color: var(--gray-50);
+    }
+
+    .bg-blue-50 {
+      background-color: var(--blue-50);
+    }
+
+    .bg-green-50 {
+      background-color: var(--green-50);
+    }
+
+    .bg-blue-600 {
+      background-color: var(--blue-600);
+    }
+
+    .bg-blue-500 {
+      background-color: var(--blue-500);
+    }
+
+    .bg-red-500 {
+      background-color: var(--red-500);
+    }
+
+    .bg-green-500 {
+      background-color: var(--green-500);
+    }
+
+    .bg-green-600 {
+      background-color: var(--green-600);
+    }
+
+    .bg-gray-300 {
+      background-color: var(--gray-300);
+    }
+
+    .text-white {
+      color: white;
+    }
+
+    .text-gray-900 {
+      color: var(--gray-900);
+    }
+
+    .text-gray-700 {
+      color: var(--gray-700);
+    }
+
+    .text-gray-600 {
+      color: var(--gray-600);
+    }
+
+    .text-gray-500 {
+      color: var(--gray-500);
+    }
+
+    .text-blue-100 {
+      color: var(--blue-100);
+    }
+
+    .text-blue-50 {
+      color: #f0f9ff;
+    }
+
+    .text-blue-600 {
+      color: var(--blue-600);
+    }
+
+    .text-green-600 {
+      color: var(--green-600);
+    }
+
+    .text-red-600 {
+      color: var(--red-600);
+    }
+
+    .text-sm {
+      font-size: 0.875rem;
+    }
+
+    .text-lg {
+      font-size: 1.125rem;
+    }
+
+    .text-2xl {
+      font-size: 1.5rem;
+    }
+
+    .text-3xl {
+      font-size: 1.875rem;
+    }
+
+    .font-medium {
+      font-weight: 500;
+    }
+
+    .font-semibold {
+      font-weight: 600;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .uppercase {
+      text-transform: uppercase;
+    }
+
+    header {
+      background-color: white;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-content {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    main {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    @media (min-width: 768px) {
+      .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .md\:grid-cols-2.gap-4 {
+        gap: 1rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .gap-2 {
+      gap: 0.5rem;
+    }
+
+    .gap-3 {
+      gap: 0.75rem;
+    }
+
+    .gap-4 {
+      gap: 1rem;
+    }
+
+    .gap-6 {
+      gap: 1.5rem;
+    }
+
+    .mb-2 {
+      margin-bottom: 0.5rem;
+    }
+
+    .mb-3 {
+      margin-bottom: 0.75rem;
+    }
+
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+
+    .mb-6 {
+      margin-bottom: 1.5rem;
+    }
+
+    .mb-8 {
+      margin-bottom: 2rem;
+    }
+
+    .mt-1 {
+      margin-top: 0.25rem;
+    }
+
+    .mt-2 {
+      margin-top: 0.5rem;
+    }
+
+    .mt-4 {
+      margin-bottom: 1rem;
+    }
+
+    .space-y-2 > * + * {
+      margin-top: 0.5rem;
+    }
+
+    .space-y-4 > * + * {
+      margin-top: 1rem;
+    }
+
+    .space-y-6 > * + * {
+      margin-top: 1.5rem;
+    }
+
+    .py-2 {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .py-3 {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+
+    .py-4 {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .py-8 {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .py-12 {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+
+    .py-16 {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+
+    .px-2 {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
+    .px-3 {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    .px-4 {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .px-6 {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .px-8 {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    .p-4 {
+      padding: 1rem;
+    }
+
+    .p-6 {
+      padding: 1.5rem;
+    }
+
+    .rounded {
+      border-radius: 0.25rem;
+    }
+
+    .rounded-lg {
+      border-radius: 0.5rem;
+    }
+
+    .rounded-xl {
+      border-radius: 0.75rem;
+    }
+
+    .border {
+      border: 1px solid var(--gray-300);
+    }
+
+    .border-2 {
+      border: 2px solid;
+    }
+
+    .border-gray-300 {
+      border-color: var(--gray-300);
+    }
+
+    .border-blue-200 {
+      border-color: var(--blue-200);
+    }
+
+    .border-green-200 {
+      border-color: #dcfce7;
+    }
+
+    .border-green-300 {
+      border-color: #86efac;
+    }
+
+    .border-dashed {
+      border-style: dashed;
+    }
+
+    .border-l-4 {
+      border-left: 4px solid;
+    }
+
+    .border-blue-500 {
+      border-color: var(--blue-500);
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .flex-1 {
+      flex: 1 1 0%;
+    }
+
+    .flex-col {
+      flex-direction: column;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .items-start {
+      align-items: flex-start;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .justify-center {
+      display: flex;
+      justify-content: center;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background-color: var(--blue-600);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--blue-700);
+    }
+
+    .btn-success {
+      background-color: var(--green-600);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: var(--green-700);
+    }
+
+    .btn-danger {
+      background-color: var(--red-500);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--red-600);
+    }
+
+    .btn-secondary {
+      background-color: var(--gray-300);
+      color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--gray-400);
+    }
+
+    input, textarea, select {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      ring: 2px solid var(--blue-500);
+      box-shadow: 0 0 0 3px var(--blue-200);
+    }
+
+    .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .shadow-xl {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .hover\:shadow-lg:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .transition {
+      transition: all 0.2s;
+    }
+
+    .center-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 50;
+    }
+
+    .modal {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      max-width: 28rem;
+      width: 100%;
+    }
+
+    .card {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .composition-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .composition-high_angle {
+      background-color: #fecaca;
+      color: #7f1d1d;
+    }
+
+    .composition-eye_level {
+      background-color: #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .composition-low_angle {
+      background-color: #86efac;
+      color: #15803d;
+    }
+
+    .composition-dutch_angle {
+      background-color: #fcd34d;
+      color: #78350f;
+    }
+
+    .gradient-to-r {
+      background: linear-gradient(to right, var(--blue-600), var(--blue-700));
+    }
+
+    .gradient-to-b {
+      background: linear-gradient(to bottom, var(--gray-50), white);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .grid-cols-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 768px) {
+      .md\:grid-cols-2 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+
+      .lg\:grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+
+      header {
+        flex-wrap: wrap;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: bold;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 4rem;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // ============================================
+    // 타입 정의 및 상수
+    // ============================================
+
+    const STORAGE_KEY = 'storyboards';
+
+    const COMPOSITIONS = [
+      { value: 'high_angle', label: '하이앵글 (위에서 내려다보기)' },
+      { value: 'eye_level', label: '아이레벨 (눈높이)' },
+      { value: 'low_angle', label: '로우앵글 (아래에서 올려다보기)' },
+      { value: 'dutch_angle', label: '더치앵글 (기울어진 각도)' },
+    ];
+
+    const SIZES = [
+      { value: 'long_shot', label: 'LS - 롱샷 (전체 배경 포함)' },
+      { value: 'full_shot', label: 'FS - 풀샷 (인물 전신)' },
+      { value: 'knee_shot', label: 'KS - 니샷 (무릎 위)' },
+      { value: 'middle_shot', label: 'MS - 미들샷 (허리 위)' },
+      { value: 'bust_shot', label: 'BS - 바스트샷 (가슴 위)' },
+      { value: 'head_shoulder', label: 'HS - 헤드 숄더 (머리&어깨)' },
+      { value: 'head_close_up', label: 'HCU - 헤드 클로즈업 (얼굴만)' },
+      { value: 'object_close_up', label: 'OCU - 물체 클로즈업' },
+    ];
+
+    const LENSES = [
+      { value: '24mm', label: '24mm (광각)' },
+      { value: '35mm', label: '35mm' },
+      { value: '50mm', label: '50mm (표준)' },
+      { value: '85mm', label: '85mm (포트레이트)' },
+      { value: '105mm', label: '105mm' },
+      { value: '200mm', label: '200mm (망원)' },
+    ];
+
+    const MOVINGS = [
+      { value: 'static', label: '스태틱 (움직임 없음)' },
+      { value: 'pan', label: '팬 (좌우 움직임)' },
+      { value: 'tilt', label: '틸트 (위아래 움직임)' },
+      { value: 'dolly_in', label: '돌리 인 (전진 움직임)' },
+      { value: 'dolly_out', label: '돌리 아웃 (후진 움직임)' },
+      { value: 'crane', label: '크레인 (높낮이 움직임)' },
+      { value: 'zoom', label: '줌' },
+      { value: 'tracking', label: '트래킹 (따라감)' },
+      { value: 'handheld', label: '핸드헬드 (손 흔들림)' },
+    ];
+
+    // ============================================
+    // 스토리보드 매니저 클래스
+    // ============================================
+
+    class StoryboardManager {
+      constructor(autoSave = true) {
+        this.storyboards = new Map();
+        this.autoSave = autoSave;
+        this.loadFromStorage();
+      }
+
+      generateId() {
+        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      }
+
+      loadFromStorage() {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (!data) return;
+        try {
+          const storyboards = JSON.parse(data);
+          storyboards.forEach(sb => {
+            sb.createdAt = new Date(sb.createdAt);
+            sb.updatedAt = new Date(sb.updatedAt);
+            sb.scenes = (sb.scenes || []).map(scene => ({
+              ...scene,
+              createdAt: new Date(scene.createdAt),
+              updatedAt: new Date(scene.updatedAt),
+            }));
+            this.storyboards.set(sb.id, sb);
+          });
+        } catch (error) {
+          console.error('스토리보드 로드 실패:', error);
+        }
+      }
+
+      persistToStorage() {
+        if (this.autoSave) {
+          const data = Array.from(this.storyboards.values());
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+      }
+
+      createStoryboard(title, description = '') {
+        const storyboard = {
+          id: this.generateId(),
+          title,
+          description,
+          scenes: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        this.storyboards.set(storyboard.id, storyboard);
+        this.persistToStorage();
+        return storyboard;
+      }
+
+      getStoryboard(id) {
+        const sb = this.storyboards.get(id);
+        if (!sb) throw new Error('Storyboard not found');
+        return sb;
+      }
+
+      getAllStoryboards() {
+        return Array.from(this.storyboards.values());
+      }
+
+      deleteStoryboard(id) {
+        this.storyboards.delete(id);
+        this.persistToStorage();
+      }
+
+      addScene(storyboardId, name, description = '') {
+        const storyboard = this.getStoryboard(storyboardId);
+        const scene = {
+          id: this.generateId(),
+          sceneNumber: storyboard.scenes.length + 1,
+          name,
+          description,
+          shots: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        storyboard.scenes.push(scene);
+        this.updateStoryboardTimestamp(storyboardId);
+        this.persistToStorage();
+        return scene;
+      }
+
+      deleteScene(storyboardId, sceneId) {
+        const storyboard = this.getStoryboard(storyboardId);
+        const idx = storyboard.scenes.findIndex(s => s.id === sceneId);
+        if (idx === -1) throw new Error('Scene not found');
+        storyboard.scenes.splice(idx, 1);
+        storyboard.scenes.forEach((scene, i) => {
+          scene.sceneNumber = i + 1;
+        });
+        this.updateStoryboardTimestamp(storyboardId);
+        this.persistToStorage();
+      }
+
+      addShot(storyboardId, sceneId, shotData) {
+        const storyboard = this.getStoryboard(storyboardId);
+        const scene = storyboard.scenes.find(s => s.id === sceneId);
+        if (!scene) throw new Error('Scene not found');
+
+        const shot = {
+          id: this.generateId(),
+          shotNumber: scene.shots.length + 1,
+          composition: shotData.composition,
+          size: shotData.size,
+          lens: shotData.lens,
+          moving: shotData.moving,
+          description: shotData.description || '',
+          notes: shotData.notes || '',
+        };
+        scene.shots.push(shot);
+        this.updateStoryboardTimestamp(storyboardId);
+        this.persistToStorage();
+        return shot;
+      }
+
+      deleteShot(storyboardId, sceneId, shotId) {
+        const storyboard = this.getStoryboard(storyboardId);
+        const scene = storyboard.scenes.find(s => s.id === sceneId);
+        if (!scene) throw new Error('Scene not found');
+
+        const idx = scene.shots.findIndex(s => s.id === shotId);
+        if (idx === -1) throw new Error('Shot not found');
+        scene.shots.splice(idx, 1);
+        scene.shots.forEach((shot, i) => {
+          shot.shotNumber = i + 1;
+        });
+        this.updateStoryboardTimestamp(storyboardId);
+        this.persistToStorage();
+      }
+
+      updateShot(storyboardId, sceneId, shotId, updates) {
+        const storyboard = this.getStoryboard(storyboardId);
+        const scene = storyboard.scenes.find(s => s.id === sceneId);
+        if (!scene) throw new Error('Scene not found');
+
+        const shot = scene.shots.find(s => s.id === shotId);
+        if (!shot) throw new Error('Shot not found');
+
+        if (updates.composition !== undefined) shot.composition = updates.composition;
+        if (updates.size !== undefined) shot.size = updates.size;
+        if (updates.lens !== undefined) shot.lens = updates.lens;
+        if (updates.moving !== undefined) shot.moving = updates.moving;
+        if (updates.description !== undefined) shot.description = updates.description;
+        if (updates.notes !== undefined) shot.notes = updates.notes;
+
+        this.updateStoryboardTimestamp(storyboardId);
+        this.persistToStorage();
+        return shot;
+      }
+
+      updateStoryboardTimestamp(storyboardId) {
+        const sb = this.storyboards.get(storyboardId);
+        if (sb) sb.updatedAt = new Date();
+      }
+
+      exportStoryboard(storyboard) {
+        return JSON.stringify(storyboard, null, 2);
+      }
+
+      importStoryboard(jsonData) {
+        try {
+          const data = JSON.parse(jsonData);
+          if (!data.id || !data.title || !Array.isArray(data.scenes)) {
+            return null;
+          }
+          data.createdAt = new Date(data.createdAt);
+          data.updatedAt = new Date(data.updatedAt);
+          data.scenes = data.scenes.map(scene => ({
+            ...scene,
+            createdAt: new Date(scene.createdAt),
+            updatedAt: new Date(scene.updatedAt),
+          }));
+          this.storyboards.set(data.id, data);
+          this.persistToStorage();
+          return data;
+        } catch (error) {
+          console.error('스토리보드 가져오기 실패:', error);
+          return null;
+        }
+      }
+    }
+
+    // ============================================
+    // 전역 상태 및 관리
+    // ============================================
+
+    const manager = new StoryboardManager(true);
+    let currentStoryboard = null;
+
+    // ============================================
+    // UI 렌더링 함수
+    // ============================================
+
+    function createSelect(id, label, options, value, onChange) {
+      return `
+        <div>
+          <label for="${id}" class="text-sm font-medium text-gray-700 mb-2">${label}</label>
+          <select id="${id}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            ${options.map(opt => `<option value="${opt.value}" ${opt.value === value ? 'selected' : ''}>${opt.label}</option>`).join('')}
+          </select>
+        </div>
+      `;
+    }
+
+    function createShotCard(shot, sceneId) {
+      const composition = COMPOSITIONS.find(c => c.value === shot.composition);
+      const size = SIZES.find(s => s.value === shot.size);
+      const lens = LENSES.find(l => l.value === shot.lens);
+      const moving = MOVINGS.find(m => m.value === shot.moving);
+
+      return `
+        <div class="card border-l-4 border-blue-500 p-4">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h4 class="font-semibold text-gray-800">컷 #${shot.shotNumber}</h4>
+              ${shot.description ? `<p class="text-sm text-gray-600 mt-1">${shot.description}</p>` : ''}
+            </div>
+            <div class="flex gap-2">
+              <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition" onclick="editShot('${sceneId}', '${shot.id}')">편집</button>
+              <button class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition" onclick="deleteShot('${sceneId}', '${shot.id}')">삭제</button>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">구도</p>
+                <p class="composition-badge composition-${shot.composition}">${composition ? composition.label : ''}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">사이즈</p>
+                <p class="text-sm font-medium text-gray-700">${size ? size.label : ''}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">렌즈</p>
+                <p class="text-sm font-medium text-gray-700">${lens ? lens.label : ''}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">무빙</p>
+                <p class="text-sm font-medium text-gray-700">${moving ? moving.label : ''}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function createScenePanel(scene) {
+      return `
+        <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg shadow-lg overflow-hidden">
+          <div class="gradient-to-r text-white p-6">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-2xl font-bold">씬 #${scene.sceneNumber}</h3>
+                <p class="text-blue-100 mt-1">${scene.name}</p>
+                ${scene.description ? `<p class="text-blue-50 text-sm mt-2">${scene.description}</p>` : ''}
+              </div>
+              <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition font-medium" onclick="deleteScene('${scene.id}')">씬 삭제</button>
+            </div>
+          </div>
+          <div class="p-6">
+            ${scene.shots.length === 0 ? '<p class="text-center text-gray-500 py-8">컷이 없습니다. 아래에서 컷을 추가하세요.</p>' : `
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                ${scene.shots.map(shot => createShotCard(shot, scene.id)).join('')}
+              </div>
+            `}
+            <button class="w-full py-3 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition font-medium" onclick="showAddShotForm('${scene.id}')">+ 새로운 컷 추가</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStoryboardList() {
+      const storyboards = manager.getAllStoryboards();
+      const app = document.getElementById('app');
+
+      app.innerHTML = `
+        <header>
+          <div class="header-content">
+            <h1 class="text-3xl font-bold text-gray-900">🎬 스토리보드 메이커</h1>
+            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium btn" onclick="showNewStoryboardDialog()">새 스토리보드</button>
+          </div>
+        </header>
+
+        <main>
+          <div class="text-center py-16">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">스토리보드를 시작하세요</h2>
+            <p class="text-gray-600 mb-8">새 스토리보드를 만들거나 기존 스토리보드를 선택하세요.</p>
+
+            ${storyboards.length > 0 ? `
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                ${storyboards.map(sb => `
+                  <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900">${sb.title}</h3>
+                    ${sb.description ? `<p class="text-gray-600 text-sm mt-2">${sb.description}</p>` : ''}
+                    <p class="text-gray-500 text-sm mt-4">씬 ${sb.scenes.length}개</p>
+                    <div class="flex gap-2 mt-4">
+                      <button class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition" onclick="openStoryboard('${sb.id}')">열기</button>
+                      <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition" onclick="confirmDeleteStoryboard('${sb.id}', '${sb.title}')">삭제</button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <button class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-lg" onclick="showNewStoryboardDialog()">새 스토리보드 만들기</button>
+          </div>
+        </main>
+      `;
+    }
+
+    function renderStoryboardEditor() {
+      if (!currentStoryboard) return renderStoryboardList();
+
+      const app = document.getElementById('app');
+
+      app.innerHTML = `
+        <header>
+          <div class="header-content">
+            <h1 class="text-3xl font-bold text-gray-900">🎬 스토리보드 메이커</h1>
+            <div class="flex gap-3">
+              <button class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition" onclick="exportCurrentStoryboard()">내보내기</button>
+              <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition" onclick="goBack()">돌아가기</button>
+            </div>
+          </div>
+        </header>
+
+        <main>
+          <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="text-3xl font-bold text-gray-900">${currentStoryboard.title}</h2>
+                ${currentStoryboard.description ? `<p class="text-gray-600 mt-2">${currentStoryboard.description}</p>` : ''}
+              </div>
+            </div>
+          </div>
+
+          ${currentStoryboard.scenes.length === 0 ? `
+            <div class="text-center py-12 bg-white rounded-lg shadow-md">
+              <p class="text-gray-500 mb-4">아직 씬이 없습니다.</p>
+              <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onclick="showNewSceneDialog()">첫 번째 씬 추가</button>
+            </div>
+          ` : `
+            <div class="space-y-6 mb-8">
+              ${currentStoryboard.scenes.map(scene => createScenePanel(scene)).join('')}
+            </div>
+          `}
+
+          <button class="w-full py-4 border-2 border-dashed border-green-300 rounded-lg text-green-600 hover:bg-green-50 transition font-medium text-lg mb-8" onclick="showNewSceneDialog()">+ 새로운 씬 추가</button>
+        </main>
+      `;
+    }
+
+    // ============================================
+    // 이벤트 핸들러
+    // ============================================
+
+    function showNewStoryboardDialog() {
+      const title = prompt('스토리보드 제목을 입력하세요:');
+      if (title && title.trim()) {
+        manager.createStoryboard(title.trim());
+        renderStoryboardList();
+      }
+    }
+
+    function openStoryboard(id) {
+      currentStoryboard = manager.getStoryboard(id);
+      renderStoryboardEditor();
+    }
+
+    function confirmDeleteStoryboard(id, title) {
+      if (confirm(`"${title}"을(를) 삭제하시겠습니까?`)) {
+        manager.deleteStoryboard(id);
+        renderStoryboardList();
+      }
+    }
+
+    function deleteStoryboard(id) {
+      manager.deleteStoryboard(id);
+      currentStoryboard = null;
+      renderStoryboardList();
+    }
+
+    function goBack() {
+      currentStoryboard = null;
+      renderStoryboardList();
+    }
+
+    function showNewSceneDialog() {
+      if (!currentStoryboard) return;
+      const name = prompt('씬 이름을 입력하세요 (예: 오프닝, 제품 소개):');
+      if (name && name.trim()) {
+        manager.addScene(currentStoryboard.id, name.trim());
+        currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+        renderStoryboardEditor();
+      }
+    }
+
+    function deleteScene(sceneId) {
+      if (!currentStoryboard) return;
+      if (confirm('이 씬을 삭제하시겠습니까?')) {
+        manager.deleteScene(currentStoryboard.id, sceneId);
+        currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+        renderStoryboardEditor();
+      }
+    }
+
+    function showAddShotForm(sceneId) {
+      if (!currentStoryboard) return;
+      const html = `
+        <div class="modal-overlay" onclick="if(event.target === this) closeModal()">
+          <div class="modal">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">새로운 컷 추가</h2>
+            <form onsubmit="handleAddShot(event, '${sceneId}')">
+              <div class="form-group mb-4">
+                ${createSelect('composition-select', '구도', COMPOSITIONS, 'eye_level')}
+                ${createSelect('size-select', '사이즈', SIZES, 'full_shot')}
+                ${createSelect('lens-select', '렌즈', LENSES, '50mm')}
+                ${createSelect('moving-select', '무빙', MOVINGS, 'static')}
+              </div>
+              <div class="mb-4">
+                <label for="description-textarea" class="text-sm font-medium text-gray-700 mb-2">설명 (선택)</label>
+                <textarea id="description-textarea" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="이 컷에 대한 설명을 입력하세요..."></textarea>
+              </div>
+              <div class="flex gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">컷 추가</button>
+                <button type="button" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium" onclick="closeModal()">취소</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.getElementById('app').insertAdjacentHTML('beforeend', html);
+    }
+
+    function handleAddShot(event, sceneId) {
+      event.preventDefault();
+      if (!currentStoryboard) return;
+
+      const composition = document.getElementById('composition-select').value;
+      const size = document.getElementById('size-select').value;
+      const lens = document.getElementById('lens-select').value;
+      const moving = document.getElementById('moving-select').value;
+      const description = document.getElementById('description-textarea').value;
+
+      manager.addShot(currentStoryboard.id, sceneId, {
+        composition,
+        size,
+        lens,
+        moving,
+        description,
+      });
+
+      currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+      closeModal();
+      renderStoryboardEditor();
+    }
+
+    function editShot(sceneId, shotId) {
+      if (!currentStoryboard) return;
+      const scene = currentStoryboard.scenes.find(s => s.id === sceneId);
+      if (!scene) return;
+      const shot = scene.shots.find(s => s.id === shotId);
+      if (!shot) return;
+
+      const html = `
+        <div class="modal-overlay" onclick="if(event.target === this) closeModal()">
+          <div class="modal">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">컷 편집</h2>
+            <form onsubmit="handleUpdateShot(event, '${sceneId}', '${shotId}')">
+              <div class="form-group mb-4">
+                ${createSelect('composition-edit', '구도', COMPOSITIONS, shot.composition)}
+                ${createSelect('size-edit', '사이즈', SIZES, shot.size)}
+                ${createSelect('lens-edit', '렌즈', LENSES, shot.lens)}
+                ${createSelect('moving-edit', '무빙', MOVINGS, shot.moving)}
+              </div>
+              <div class="mb-4">
+                <label for="description-edit" class="text-sm font-medium text-gray-700 mb-2">설명</label>
+                <textarea id="description-edit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="이 컷에 대한 설명을 입력하세요...">${shot.description}</textarea>
+              </div>
+              <div class="flex gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">저장</button>
+                <button type="button" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium" onclick="closeModal()">취소</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.getElementById('app').insertAdjacentHTML('beforeend', html);
+    }
+
+    function handleUpdateShot(event, sceneId, shotId) {
+      event.preventDefault();
+      if (!currentStoryboard) return;
+
+      const composition = document.getElementById('composition-edit').value;
+      const size = document.getElementById('size-edit').value;
+      const lens = document.getElementById('lens-edit').value;
+      const moving = document.getElementById('moving-edit').value;
+      const description = document.getElementById('description-edit').value;
+
+      manager.updateShot(currentStoryboard.id, sceneId, shotId, {
+        composition,
+        size,
+        lens,
+        moving,
+        description,
+      });
+
+      currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+      closeModal();
+      renderStoryboardEditor();
+    }
+
+    function deleteShot(sceneId, shotId) {
+      if (!currentStoryboard) return;
+      if (confirm('이 컷을 삭제하시겠습니까?')) {
+        manager.deleteShot(currentStoryboard.id, sceneId, shotId);
+        currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+        renderStoryboardEditor();
+      }
+    }
+
+    function exportCurrentStoryboard() {
+      if (!currentStoryboard) return;
+      const json = manager.exportStoryboard(currentStoryboard);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentStoryboard.title}-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function closeModal() {
+      const overlay = document.querySelector('.modal-overlay');
+      if (overlay) overlay.remove();
+    }
+
+    // ============================================
+    // 초기화
+    // ============================================
+
+    renderStoryboardList();
+  </script>
+</body>
+</html>
