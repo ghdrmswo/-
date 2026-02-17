@@ -1613,19 +1613,20 @@
       // PDF 내용 생성
       let htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px; width: 100%;">
-          <!-- 제목 페이지 -->
+          <!-- 1. 제목 페이지 -->
           <div style="text-align: center; page-break-after: always; padding-bottom: 100px;">
             <h1 style="font-size: 48px; margin-bottom: 20px; color: #667eea;">${currentStoryboard.title}</h1>
             <p style="font-size: 18px; color: #666; margin-bottom: 10px;">${currentStoryboard.description || ''}</p>
             <p style="font-size: 14px; color: #999; margin-top: 40px;">내보내기 날짜: ${new Date().toLocaleDateString('ko-KR')}</p>
           </div>
 
-          <!-- 마스터 사양 -->
+          <!-- 2. 마스터 사양 & 씬 설정 페이지 -->
           <div style="page-break-after: always;">
+            <!-- 마스터 사양 -->
             <h2 style="font-size: 24px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px;">⚙️ 마스터 사양</h2>
-            <table style="width: 100%; border-collapse: collapse;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
               <tr style="background-color: #f5f5f5;">
-                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">해상도</td>
+                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; width: 20%;">해상도</td>
                 <td style="padding: 10px; border: 1px solid #ddd;">${RESOLUTIONS.find(r => r.value === currentStoryboard.masterResolution)?.label || currentStoryboard.masterResolution}</td>
               </tr>
               <tr>
@@ -1637,31 +1638,45 @@
                 <td style="padding: 10px; border: 1px solid #ddd;">${LOG_RECORDING.find(l => l.value === currentStoryboard.masterLogRecording)?.label || currentStoryboard.masterLogRecording}</td>
               </tr>
             </table>
+
+            <!-- 씬 설정 정보 -->
+            <h2 style="font-size: 24px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px;">🎬 씬 설정</h2>
+      `;
+
+      // 모든 씬의 설정 정보를 한 페이지에 표시
+      currentStoryboard.scenes.forEach((scene, sceneIdx) => {
+        const timeOfDayLabel = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay)?.label || scene.timeOfDay;
+        htmlContent += `
+          <div style="margin-bottom: 15px; padding: 12px; background-color: #f9f9f9; border-left: 3px solid #667eea;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">씬 #${scene.sceneNumber} - ${scene.name}</p>
+            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 3px 6px; background-color: #fff; font-weight: bold; width: 15%;"><strong>시간대</strong></td>
+                <td style="padding: 3px 6px;">${timeOfDayLabel}</td>
+                <td style="padding: 3px 6px; background-color: #fff; font-weight: bold; width: 15%;"><strong>배역</strong></td>
+                <td style="padding: 3px 6px;">${scene.character || '-'}</td>
+              </tr>
+              <tr style="background-color: #fafafa;">
+                <td style="padding: 3px 6px; background-color: #fafafa; font-weight: bold;"><strong>장소</strong></td>
+                <td style="padding: 3px 6px;">${scene.location || '-'}</td>
+                <td style="padding: 3px 6px; background-color: #fafafa; font-weight: bold;"><strong>배경설정</strong></td>
+                <td style="padding: 3px 6px;">${scene.setDesign || '-'}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+      });
+
+      htmlContent += `
           </div>
 
-          <!-- 씬별 상세 정보 -->
+          <!-- 3. 컷 상세 정보 페이지들 -->
       `;
 
       currentStoryboard.scenes.forEach((scene, sceneIdx) => {
         const timeOfDayLabel = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay)?.label || scene.timeOfDay;
 
-        htmlContent += `
-          <div style="margin-bottom: 30px;">
-            <h3 style="font-size: 20px; color: #667eea; margin-bottom: 15px; border-left: 4px solid #667eea; padding-left: 15px;">
-              씬 #${scene.sceneNumber} - ${scene.name}
-            </h3>
-            <div style="margin-left: 20px; margin-bottom: 10px;">
-              <p style="margin: 3px 0; color: #666;"><strong>시간대:</strong> ${timeOfDayLabel}</p>
-              ${scene.description ? `<p style="margin: 3px 0; color: #666;"><strong>설명:</strong> ${scene.description}</p>` : ''}
-              ${scene.character ? `<p style="margin: 3px 0; color: #666;"><strong>배역:</strong> ${scene.character}</p>` : ''}
-              ${scene.location ? `<p style="margin: 3px 0; color: #666;"><strong>장소:</strong> ${scene.location}</p>` : ''}
-              ${scene.setDesign ? `<p style="margin: 3px 0; color: #666;"><strong>배경설정:</strong> ${scene.setDesign}</p>` : ''}
-            </div>
-        `;
-
-        if (scene.shots.length === 0) {
-          htmlContent += `<p style="color: #999; font-style: italic;">컷이 없습니다.</p>`;
-        } else {
+        if (scene.shots.length > 0) {
           scene.shots.forEach(shot => {
             const compositionLabel = COMPOSITIONS.find(c => c.value === shot.composition)?.label || shot.composition;
             const sizeLabel = SIZES.find(s => s.value === shot.size)?.label || shot.size;
@@ -1724,7 +1739,6 @@
             `;
           });
         }
-        htmlContent += `</div>`;
       });
 
       htmlContent += `</div>`;
