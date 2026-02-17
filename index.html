@@ -682,6 +682,7 @@
       margin: 0;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div id="app"></div>
@@ -1492,43 +1493,55 @@
     function exportCurrentStoryboard() {
       if (!currentStoryboard) return;
 
-      // CSV 헤더
-      const headers = [
-        '씬번호',
-        '씬이름',
-        '씬설명',
-        '시간대',
-        '컷번호',
-        '구도',
-        '사이즈',
-        '렌즈',
-        '무빙',
-        '촬영기법',
-        '장면길이',
-        '배역',
-        '장소',
-        '소품',
-        '배경설정',
-        '설명'
-      ];
+      // PDF 내용 생성
+      let htmlContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; width: 100%;">
+          <!-- 제목 페이지 -->
+          <div style="text-align: center; page-break-after: always; padding-bottom: 100px;">
+            <h1 style="font-size: 48px; margin-bottom: 20px; color: #667eea;">${currentStoryboard.title}</h1>
+            <p style="font-size: 18px; color: #666; margin-bottom: 10px;">${currentStoryboard.description || ''}</p>
+            <p style="font-size: 14px; color: #999; margin-top: 40px;">내보내기 날짜: ${new Date().toLocaleDateString('ko-KR')}</p>
+          </div>
 
-      // CSV 데이터 행 생성
-      const rows = [];
-      currentStoryboard.scenes.forEach(scene => {
+          <!-- 마스터 사양 -->
+          <div style="page-break-after: always;">
+            <h2 style="font-size: 24px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px;">⚙️ 마스터 사양</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr style="background-color: #f5f5f5;">
+                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">해상도</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${RESOLUTIONS.find(r => r.value === currentStoryboard.masterResolution)?.label || currentStoryboard.masterResolution}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">FPS</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${currentStoryboard.masterFps}</td>
+              </tr>
+              <tr style="background-color: #f5f5f5;">
+                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">로그촬영</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${LOG_RECORDING.find(l => l.value === currentStoryboard.masterLogRecording)?.label || currentStoryboard.masterLogRecording}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- 씬별 상세 정보 -->
+      `;
+
+      currentStoryboard.scenes.forEach((scene, sceneIdx) => {
         const timeOfDayLabel = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay)?.label || scene.timeOfDay;
 
+        htmlContent += `
+          <div style="page-break-inside: avoid; margin-bottom: 30px;">
+            <h3 style="font-size: 20px; color: #667eea; margin-bottom: 15px; border-left: 4px solid #667eea; padding-left: 15px;">
+              씬 #${scene.sceneNumber} - ${scene.name}
+            </h3>
+            <div style="margin-left: 20px; margin-bottom: 15px;">
+              <p style="margin: 5px 0; color: #666;"><strong>시간대:</strong> ${timeOfDayLabel}</p>
+              ${scene.description ? `<p style="margin: 5px 0; color: #666;"><strong>설명:</strong> ${scene.description}</p>` : ''}
+            </div>
+        `;
+
         if (scene.shots.length === 0) {
-          // 씬에 컷이 없는 경우
-          rows.push([
-            scene.sceneNumber,
-            scene.name,
-            scene.description || '',
-            timeOfDayLabel,
-            '',
-            '', '', '', '', '', '', '', '', '', '', ''
-          ]);
+          htmlContent += `<p style="color: #999; font-style: italic;">컷이 없습니다.</p>`;
         } else {
-          // 각 컷마다 행 추가
           scene.shots.forEach(shot => {
             const compositionLabel = COMPOSITIONS.find(c => c.value === shot.composition)?.label || shot.composition;
             const sizeLabel = SIZES.find(s => s.value === shot.size)?.label || shot.size;
@@ -1536,55 +1549,66 @@
             const movingLabel = MOVINGS.find(m => m.value === shot.moving)?.label || shot.moving;
             const techniqueLabel = TECHNIQUES.find(t => t.value === shot.technique)?.label || shot.technique;
 
-            rows.push([
-              scene.sceneNumber,
-              scene.name,
-              scene.description || '',
-              timeOfDayLabel,
-              shot.shotNumber,
-              compositionLabel,
-              sizeLabel,
-              lensLabel,
-              movingLabel,
-              techniqueLabel,
-              shot.duration || '',
-              shot.character || '',
-              shot.location || '',
-              shot.props || '',
-              shot.setDesign || '',
-              shot.description || ''
-            ]);
+            htmlContent += `
+              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 3px solid #764ba2;">
+                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px;">컷 #${shot.shotNumber}</h4>
+                <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff; width: 25%;"><strong>구도</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${compositionLabel}</td>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff; width: 25%;"><strong>사이즈</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${sizeLabel}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>렌즈</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${lensLabel}</td>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>무빙</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${movingLabel}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>촬영기법</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${techniqueLabel}</td>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>장면길이</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${shot.duration || '-'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>배역</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${shot.character || '-'}</td>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>장소</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${shot.location || '-'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>소품</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${shot.props || '-'}</td>
+                    <td style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>배경설정</strong></td>
+                    <td style="padding: 5px; border: 1px solid #eee;">${shot.setDesign || '-'}</td>
+                  </tr>
+                  ${shot.description ? `
+                  <tr>
+                    <td colspan="4" style="padding: 5px; border: 1px solid #eee; background-color: #fff;"><strong>설명:</strong> ${shot.description}</td>
+                  </tr>
+                  ` : ''}
+                </table>
+              </div>
+            `;
           });
         }
+        htmlContent += `</div>`;
       });
 
-      // CSV 문자열 생성 (CSV 안전 처리)
-      const csvContent = [
-        headers.join(','),
-        ...rows.map(row =>
-          row.map(cell => {
-            const cellStr = String(cell || '');
-            // 쉼표, 큰따옴표, 줄바꿈이 있으면 큰따옴표로 감싸고 내부 큰따옴표는 이중화
-            if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
-              return `"${cellStr.replace(/"/g, '""')}"`;
-            }
-            return cellStr;
-          }).join(',')
-        )
-      ].join('\n');
+      htmlContent += `</div>`;
 
-      // 마스터 사양 정보 추가
-      const masterSpecInfo = `\n\n마스터 사양\n해상도,${RESOLUTIONS.find(r => r.value === currentStoryboard.masterResolution)?.label || currentStoryboard.masterResolution}\nFPS,${currentStoryboard.masterFps}\n로그촬영,${LOG_RECORDING.find(l => l.value === currentStoryboard.masterLogRecording)?.label || currentStoryboard.masterLogRecording}`;
+      // PDF 옵션
+      const options = {
+        margin: 10,
+        filename: `${currentStoryboard.title}-${new Date().toISOString().split('T')[0]}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
 
-      const fullContent = csvContent + masterSpecInfo;
-
-      const blob = new Blob([fullContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${currentStoryboard.title}-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      // PDF 생성 및 다운로드
+      html2pdf().set(options).from(htmlContent).save();
     }
 
     function showMasterSpecDialog() {
