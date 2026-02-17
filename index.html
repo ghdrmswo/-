@@ -784,10 +784,16 @@
         try {
           const storyboards = JSON.parse(data);
           storyboards.forEach(sb => {
+            // 마이그레이션: 기존 데이터 호환성
+            if (!sb.masterResolution) sb.masterResolution = '4k';
+            if (!sb.masterFps) sb.masterFps = '24';
+            if (!sb.masterLogRecording) sb.masterLogRecording = 'no';
+
             sb.createdAt = new Date(sb.createdAt);
             sb.updatedAt = new Date(sb.updatedAt);
             sb.scenes = (sb.scenes || []).map(scene => ({
               ...scene,
+              timeOfDay: scene.timeOfDay || 'day',
               createdAt: new Date(scene.createdAt),
               updatedAt: new Date(scene.updatedAt),
             }));
@@ -1174,7 +1180,11 @@
               </div>
               <div class="bg-white p-3 rounded-lg">
                 <div class="text-xs font-semibold text-gray-500 uppercase mb-1">로그촬영</div>
-                <div class="text-lg font-bold text-gray-900">${LOG_RECORDING.find(l => l.value === currentStoryboard.masterLogRecording)?.label || currentStoryboard.masterLogRecording}</div>
+                <div class="text-lg font-bold text-gray-900">${
+                  (currentStoryboard.masterLogRecording === 'yes' || currentStoryboard.masterLogRecording === 'no')
+                    ? LOG_RECORDING.find(l => l.value === currentStoryboard.masterLogRecording)?.label
+                    : (currentStoryboard.masterLogRecording || '❌ 로그촬영 X')
+                }</div>
               </div>
             </div>
           </div>
