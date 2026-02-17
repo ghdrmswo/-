@@ -799,6 +799,10 @@
             sb.scenes = (sb.scenes || []).map(scene => ({
               ...scene,
               timeOfDay: scene.timeOfDay || 'day',
+              // 씬 레벨 필드 마이그레이션
+              character: scene.character || '',
+              location: scene.location || '',
+              setDesign: scene.setDesign || '',
               createdAt: new Date(scene.createdAt),
               updatedAt: new Date(scene.updatedAt),
             }));
@@ -849,7 +853,7 @@
         this.persistToStorage();
       }
 
-      addScene(storyboardId, name, description = '') {
+      addScene(storyboardId, name, description = '', sceneData = {}) {
         const storyboard = this.getStoryboard(storyboardId);
         const scene = {
           id: this.generateId(),
@@ -858,7 +862,11 @@
           description,
           shots: [],
           // 시간대
-          timeOfDay: 'day',
+          timeOfDay: sceneData.timeOfDay || 'day',
+          // 씬 레벨 정보
+          character: sceneData.character || '',
+          location: sceneData.location || '',
+          setDesign: sceneData.setDesign || '',
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -894,13 +902,11 @@
           moving: shotData.moving,
           description: shotData.description || '',
           notes: shotData.notes || '',
-          // 새 필드들
+          // 촬영 정보
           technique: shotData.technique || 'normal',
           duration: shotData.duration || '3',
-          character: shotData.character || '',
-          location: shotData.location || '',
+          // 소품 (컷별로 다를 수 있음)
           props: shotData.props || '',
-          setDesign: shotData.setDesign || '',
           // 이미지 필드
           image: shotData.image || null,
         };
@@ -941,10 +947,7 @@
         if (updates.notes !== undefined) shot.notes = updates.notes;
         if (updates.technique !== undefined) shot.technique = updates.technique;
         if (updates.duration !== undefined) shot.duration = updates.duration;
-        if (updates.character !== undefined) shot.character = updates.character;
-        if (updates.location !== undefined) shot.location = updates.location;
         if (updates.props !== undefined) shot.props = updates.props;
-        if (updates.setDesign !== undefined) shot.setDesign = updates.setDesign;
         if (updates.image !== undefined) shot.image = updates.image;
 
         this.updateStoryboardTimestamp(storyboardId);
@@ -1086,27 +1089,15 @@
               </div>
             </div>
 
-            <!-- 길이 & 인물 & 장소 & 소품 & 배경 -->
-            <div class="grid grid-cols-5 gap-2">
+            <!-- 길이 & 소품 -->
+            <div class="grid grid-cols-2 gap-2">
               <div class="info-item">
                 <div class="info-label">길이</div>
                 <div class="info-value">${shot.duration}초</div>
               </div>
               <div class="info-item">
-                <div class="info-label">인물</div>
-                <div class="info-value">${shot.character || '—'}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">장소</div>
-                <div class="info-value">${shot.location || '—'}</div>
-              </div>
-              <div class="info-item">
                 <div class="info-label">소품</div>
                 <div class="info-value text-xs">${shot.props || '—'}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">배경</div>
-                <div class="info-value text-xs">${shot.setDesign || '—'}</div>
               </div>
             </div>
           </div>
@@ -1135,6 +1126,16 @@
             </div>
           </div>
           <div class="p-6">
+            <!-- 씬 레벨 정보 -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <h4 class="font-semibold text-gray-800 mb-3">📋 씬 정보</h4>
+              <div class="grid grid-cols-3 gap-4">
+                ${scene.character ? `<div><span class="text-xs text-gray-600 font-semibold uppercase">배역</span><p class="text-sm text-gray-900 mt-1">${scene.character}</p></div>` : ''}
+                ${scene.location ? `<div><span class="text-xs text-gray-600 font-semibold uppercase">장소</span><p class="text-sm text-gray-900 mt-1">${scene.location}</p></div>` : ''}
+                ${scene.setDesign ? `<div><span class="text-xs text-gray-600 font-semibold uppercase">배경설정</span><p class="text-sm text-gray-900 mt-1">${scene.setDesign}</p></div>` : ''}
+              </div>
+            </div>
+
             ${scene.shots.length === 0 ? '<p class="text-center text-gray-500 py-8">컷이 없습니다. 아래에서 컷을 추가하세요.</p>' : `
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 ${scene.shots.map(shot => createShotCard(shot, scene.id)).join('')}
@@ -1294,12 +1295,69 @@
 
     function showNewSceneDialog() {
       if (!currentStoryboard) return;
-      const name = prompt('씬 이름을 입력하세요 (예: 오프닝, 제품 소개):');
-      if (name && name.trim()) {
-        manager.addScene(currentStoryboard.id, name.trim());
-        currentStoryboard = manager.getStoryboard(currentStoryboard.id);
-        renderStoryboardEditor();
+      const html = `
+        <div class="modal-overlay" onclick="if(event.target === this) closeModal()">
+          <div class="modal">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">새로운 씬 추가</h2>
+            <form onsubmit="handleAddScene(event)">
+              <div class="space-y-4 mb-6">
+                <div>
+                  <label for="scene-name-input" class="text-sm font-medium text-gray-700 mb-2">씬 이름</label>
+                  <input type="text" id="scene-name-input" placeholder="예: 오프닝, 제품 소개" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div>
+                  <label for="scene-description-input" class="text-sm font-medium text-gray-700 mb-2">씬 설명 (선택)</label>
+                  <textarea id="scene-description-input" placeholder="이 씬에 대한 설명" class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="2"></textarea>
+                </div>
+                <div>
+                  <label for="scene-character-input" class="text-sm font-medium text-gray-700 mb-2">등장인물</label>
+                  <input type="text" id="scene-character-input" placeholder="예: 주인공, 조연, 배경인물" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="scene-location-input" class="text-sm font-medium text-gray-700 mb-2">장소</label>
+                  <input type="text" id="scene-location-input" placeholder="예: 사무실, 카페, 야외" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label for="scene-set-design-input" class="text-sm font-medium text-gray-700 mb-2">배경설정</label>
+                  <input type="text" id="scene-set-design-input" placeholder="예: 따뜻한 톤, 미니멀, 자연광" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+              </div>
+
+              <div class="flex gap-2 mt-6">
+                <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">씬 추가</button>
+                <button type="button" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium" onclick="closeModal()">취소</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.getElementById('app').insertAdjacentHTML('beforeend', html);
+    }
+
+    function handleAddScene(event) {
+      event.preventDefault();
+      if (!currentStoryboard) return;
+
+      const name = document.getElementById('scene-name-input').value.trim();
+      const description = document.getElementById('scene-description-input').value.trim();
+      const character = document.getElementById('scene-character-input').value.trim();
+      const location = document.getElementById('scene-location-input').value.trim();
+      const setDesign = document.getElementById('scene-set-design-input').value.trim();
+
+      if (!name) {
+        alert('씬 이름을 입력해주세요');
+        return;
       }
+
+      manager.addScene(currentStoryboard.id, name, description, {
+        character,
+        location,
+        setDesign,
+      });
+
+      currentStoryboard = manager.getStoryboard(currentStoryboard.id);
+      closeModal();
+      renderStoryboardEditor();
     }
 
     function deleteScene(sceneId) {
@@ -1337,25 +1395,11 @@
                 </div>
               </div>
 
-              <!-- 배경/세트 정보 -->
-              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🎬 배경 정보</h3>
-              <div class="form-group mb-4">
-                <div>
-                  <label for="character-input" class="text-sm font-medium text-gray-700 mb-2">등장인물</label>
-                  <input type="text" id="character-input" placeholder="예: 주인공, 조연" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-                <div>
-                  <label for="location-input" class="text-sm font-medium text-gray-700 mb-2">장소</label>
-                  <input type="text" id="location-input" placeholder="예: 사무실, 야외" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-                <div>
-                  <label for="props-input" class="text-sm font-medium text-gray-700 mb-2">소품</label>
-                  <input type="text" id="props-input" placeholder="예: 책상, 의자, 카메라" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-                <div>
-                  <label for="set-design-input" class="text-sm font-medium text-gray-700 mb-2">배경설정</label>
-                  <input type="text" id="set-design-input" placeholder="예: 따뜻한 톤, 미니멀" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
+              <!-- 소품 정보 (컷별) -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🎁 소품 정보</h3>
+              <div class="mb-4">
+                <label for="props-input" class="text-sm font-medium text-gray-700 mb-2">소품 (이 컷에서만 사용)</label>
+                <input type="text" id="props-input" placeholder="예: 책상, 의자, 카메라" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
               </div>
 
               <!-- 설명 -->
@@ -1396,10 +1440,7 @@
       const moving = document.getElementById('moving-select').value;
       const technique = document.getElementById('technique-select').value;
       const duration = document.getElementById('duration-input').value;
-      const character = document.getElementById('character-input').value;
-      const location = document.getElementById('location-input').value;
       const props = document.getElementById('props-input').value;
-      const setDesign = document.getElementById('set-design-input').value;
       const description = document.getElementById('description-textarea').value;
 
       // 이미지 처리
@@ -1414,10 +1455,7 @@
             description,
             technique,
             duration,
-            character,
-            location,
             props,
-            setDesign,
             image: compressedImage,
           });
 
@@ -1434,10 +1472,7 @@
           description,
           technique,
           duration,
-          character,
-          location,
           props,
-          setDesign,
         });
 
         currentStoryboard = manager.getStoryboard(currentStoryboard.id);
@@ -1477,25 +1512,11 @@
                 </div>
               </div>
 
-              <!-- 배경/세트 정보 -->
-              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🎬 배경 정보</h3>
-              <div class="form-group mb-4">
-                <div>
-                  <label for="character-edit" class="text-sm font-medium text-gray-700 mb-2">등장인물</label>
-                  <input type="text" id="character-edit" value="${shot.character}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-                <div>
-                  <label for="location-edit" class="text-sm font-medium text-gray-700 mb-2">장소</label>
-                  <input type="text" id="location-edit" value="${shot.location}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-                <div>
-                  <label for="props-edit" class="text-sm font-medium text-gray-700 mb-2">소품</label>
-                  <input type="text" id="props-edit" value="${shot.props}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-                <div>
-                  <label for="set-design-edit" class="text-sm font-medium text-gray-700 mb-2">배경설정</label>
-                  <input type="text" id="set-design-edit" value="${shot.setDesign}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
+              <!-- 소품 정보 (컷별) -->
+              <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">🎁 소품 정보</h3>
+              <div class="mb-4">
+                <label for="props-edit" class="text-sm font-medium text-gray-700 mb-2">소품 (이 컷에서만 사용)</label>
+                <input type="text" id="props-edit" value="${shot.props}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
               </div>
 
               <!-- 설명 -->
@@ -1536,10 +1557,7 @@
       const moving = document.getElementById('moving-edit').value;
       const technique = document.getElementById('technique-edit').value;
       const duration = document.getElementById('duration-edit').value;
-      const character = document.getElementById('character-edit').value;
-      const location = document.getElementById('location-edit').value;
       const props = document.getElementById('props-edit').value;
-      const setDesign = document.getElementById('set-design-edit').value;
       const description = document.getElementById('description-edit').value;
 
       // 이미지 처리
@@ -1554,10 +1572,7 @@
             description,
             technique,
             duration,
-            character,
-            location,
             props,
-            setDesign,
             image: compressedImage,
           });
 
@@ -1574,10 +1589,7 @@
           description,
           technique,
           duration,
-          character,
-          location,
           props,
-          setDesign,
         });
 
         currentStoryboard = manager.getStoryboard(currentStoryboard.id);
@@ -1634,13 +1646,16 @@
         const timeOfDayLabel = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay)?.label || scene.timeOfDay;
 
         htmlContent += `
-          <div style="page-break-inside: avoid; margin-bottom: 30px;">
+          <div style="margin-bottom: 30px;">
             <h3 style="font-size: 20px; color: #667eea; margin-bottom: 15px; border-left: 4px solid #667eea; padding-left: 15px;">
               씬 #${scene.sceneNumber} - ${scene.name}
             </h3>
-            <div style="margin-left: 20px; margin-bottom: 15px;">
-              <p style="margin: 5px 0; color: #666;"><strong>시간대:</strong> ${timeOfDayLabel}</p>
-              ${scene.description ? `<p style="margin: 5px 0; color: #666;"><strong>설명:</strong> ${scene.description}</p>` : ''}
+            <div style="margin-left: 20px; margin-bottom: 10px;">
+              <p style="margin: 3px 0; color: #666;"><strong>시간대:</strong> ${timeOfDayLabel}</p>
+              ${scene.description ? `<p style="margin: 3px 0; color: #666;"><strong>설명:</strong> ${scene.description}</p>` : ''}
+              ${scene.character ? `<p style="margin: 3px 0; color: #666;"><strong>배역:</strong> ${scene.character}</p>` : ''}
+              ${scene.location ? `<p style="margin: 3px 0; color: #666;"><strong>장소:</strong> ${scene.location}</p>` : ''}
+              ${scene.setDesign ? `<p style="margin: 3px 0; color: #666;"><strong>배경설정:</strong> ${scene.setDesign}</p>` : ''}
             </div>
         `;
 
@@ -1655,60 +1670,50 @@
             const techniqueLabel = TECHNIQUES.find(t => t.value === shot.technique)?.label || shot.technique;
 
             htmlContent += `
-              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 3px solid #764ba2; page-break-inside: avoid;">
+              <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #764ba2; page-break-inside: avoid;">
                 <table style="width: 100%; border-collapse: collapse;">
                   <tr>
-                    <!-- 왼쪽: 이미지 (너비 280px) -->
-                    <td style="width: 280px; padding-right: 15px; vertical-align: top; border: none;">
-                      <h4 style="font-size: 14px; color: #333; margin: 0 0 10px 0;">컷 #${shot.shotNumber}</h4>
-                      ${shot.image ? `<img src="${shot.image}" style="width: 280px; height: 280px; border-radius: 4px; object-fit: cover; display: block;">` : `<div style="width: 280px; height: 280px; background-color: #e0e0e0; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; text-align: center;">이미지 없음</div>`}
+                    <!-- 왼쪽: 이미지 (너비 160px) -->
+                    <td style="width: 160px; padding-right: 10px; vertical-align: top; border: none;">
+                      <h4 style="font-size: 12px; color: #333; margin: 0 0 6px 0; font-weight: bold;">컷 #${shot.shotNumber}</h4>
+                      ${shot.image ? `<img src="${shot.image}" style="width: 160px; height: 160px; border-radius: 4px; object-fit: cover; display: block;">` : `<div style="width: 160px; height: 160px; background-color: #e0e0e0; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 10px; text-align: center;">이미지 없음</div>`}
                     </td>
                     <!-- 오른쪽: 정보 -->
                     <td style="padding: 0; vertical-align: top; border: none;">
-                      <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                      <table style="width: 100%; font-size: 9px; border-collapse: collapse;">
                         <tr>
-                          <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold; width: 30%;"><strong>구도</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${compositionLabel}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; background-color: #fff; font-weight: bold; width: 35%;"><strong>구도</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd;">${compositionLabel.split('(')[0].trim()}</td>
                         </tr>
                         <tr style="background-color: #fafafa;">
-                          <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>사이즈</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${sizeLabel}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; font-weight: bold;"><strong>사이즈</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd;">${sizeLabel.split('-')[0].trim()}</td>
                         </tr>
                         <tr>
-                          <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>렌즈</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${lensLabel}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>렌즈</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd;">${lensLabel}</td>
                         </tr>
                         <tr style="background-color: #fafafa;">
-                          <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>무빙</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${movingLabel}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; font-weight: bold;"><strong>무빙</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd;">${movingLabel.split('(')[0].trim()}</td>
                         </tr>
                         <tr>
-                          <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>촬영기법</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${techniqueLabel}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>기법</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd;">${techniqueLabel}</td>
                         </tr>
                         <tr style="background-color: #fafafa;">
-                          <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>장면길이</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${shot.duration || '-'}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; font-weight: bold;"><strong>길이</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd;">${shot.duration}초</td>
                         </tr>
+                        ${shot.props ? `
                         <tr>
-                          <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>배역</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${shot.character || '-'}</td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>소품</strong></td>
+                          <td style="padding: 2px 3px; border: 1px solid #ddd; font-size: 8px;">${shot.props}</td>
                         </tr>
-                        <tr style="background-color: #fafafa;">
-                          <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>장소</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${shot.location || '-'}</td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 4px; border: 1px solid #ddd; background-color: #fff; font-weight: bold;"><strong>소품</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${shot.props || '-'}</td>
-                        </tr>
-                        <tr style="background-color: #fafafa;">
-                          <td style="padding: 4px; border: 1px solid #ddd; font-weight: bold;"><strong>배경설정</strong></td>
-                          <td style="padding: 4px; border: 1px solid #ddd;">${shot.setDesign || '-'}</td>
-                        </tr>
+                        ` : ''}
                         ${shot.description ? `
-                        <tr>
-                          <td colspan="2" style="padding: 4px; border: 1px solid #ddd; background-color: #fff;"><strong>설명:</strong> ${shot.description}</td>
+                        <tr style="background-color: #fafafa;">
+                          <td colspan="2" style="padding: 2px 3px; border: 1px solid #ddd; font-size: 8px;"><strong>설명:</strong> ${shot.description}</td>
                         </tr>
                         ` : ''}
                       </table>
