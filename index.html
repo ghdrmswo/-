@@ -1491,12 +1491,98 @@
 
     function exportCurrentStoryboard() {
       if (!currentStoryboard) return;
-      const json = manager.exportStoryboard(currentStoryboard);
-      const blob = new Blob([json], { type: 'application/json' });
+
+      // CSV 헤더
+      const headers = [
+        '씬번호',
+        '씬이름',
+        '씬설명',
+        '시간대',
+        '컷번호',
+        '구도',
+        '사이즈',
+        '렌즈',
+        '무빙',
+        '촬영기법',
+        '장면길이',
+        '배역',
+        '장소',
+        '소품',
+        '배경설정',
+        '설명'
+      ];
+
+      // CSV 데이터 행 생성
+      const rows = [];
+      currentStoryboard.scenes.forEach(scene => {
+        const timeOfDayLabel = TIME_OF_DAYS.find(t => t.value === scene.timeOfDay)?.label || scene.timeOfDay;
+
+        if (scene.shots.length === 0) {
+          // 씬에 컷이 없는 경우
+          rows.push([
+            scene.sceneNumber,
+            scene.name,
+            scene.description || '',
+            timeOfDayLabel,
+            '',
+            '', '', '', '', '', '', '', '', '', '', ''
+          ]);
+        } else {
+          // 각 컷마다 행 추가
+          scene.shots.forEach(shot => {
+            const compositionLabel = COMPOSITIONS.find(c => c.value === shot.composition)?.label || shot.composition;
+            const sizeLabel = SIZES.find(s => s.value === shot.size)?.label || shot.size;
+            const lensLabel = LENSES.find(l => l.value === shot.lens)?.label || shot.lens;
+            const movingLabel = MOVINGS.find(m => m.value === shot.moving)?.label || shot.moving;
+            const techniqueLabel = TECHNIQUES.find(t => t.value === shot.technique)?.label || shot.technique;
+
+            rows.push([
+              scene.sceneNumber,
+              scene.name,
+              scene.description || '',
+              timeOfDayLabel,
+              shot.shotNumber,
+              compositionLabel,
+              sizeLabel,
+              lensLabel,
+              movingLabel,
+              techniqueLabel,
+              shot.duration || '',
+              shot.character || '',
+              shot.location || '',
+              shot.props || '',
+              shot.setDesign || '',
+              shot.description || ''
+            ]);
+          });
+        }
+      });
+
+      // CSV 문자열 생성 (CSV 안전 처리)
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row =>
+          row.map(cell => {
+            const cellStr = String(cell || '');
+            // 쉼표, 큰따옴표, 줄바꿈이 있으면 큰따옴표로 감싸고 내부 큰따옴표는 이중화
+            if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+              return `"${cellStr.replace(/"/g, '""')}"`;
+            }
+            return cellStr;
+          }).join(',')
+        )
+      ].join('\n');
+
+      // 마스터 사양 정보 추가
+      const masterSpecInfo = `\n\n마스터 사양\n해상도,${RESOLUTIONS.find(r => r.value === currentStoryboard.masterResolution)?.label || currentStoryboard.masterResolution}\nFPS,${currentStoryboard.masterFps}\n로그촬영,${LOG_RECORDING.find(l => l.value === currentStoryboard.masterLogRecording)?.label || currentStoryboard.masterLogRecording}`;
+
+      const fullContent = csvContent + masterSpecInfo;
+
+      const blob = new Blob([fullContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${currentStoryboard.title}-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `${currentStoryboard.title}-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     }
